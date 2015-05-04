@@ -3,10 +3,6 @@ package cr4zyc4t.cafe24h;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,22 +42,22 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            if (result != null) {
-                try {
-                    response = new JSONObject(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (response != null) {
-                try {
-                    body.loadData(response.getJSONObject("content_detail").getString("content"), "text/html; charset=utf-8", "UTF-8");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                Toast.makeText(MainActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
-            }
+//            if (result != null) {
+//                try {
+//                    response = new JSONObject(result);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            if (response != null) {
+//                try {
+//                    body.loadData(response.getJSONObject("content_detail").getString("content"), "text/html; charset=utf-8", "UTF-8");
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            } else {
+//                Toast.makeText(MainActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+//            }
         }
     }
 }
