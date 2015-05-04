@@ -11,7 +11,6 @@
     </style>
 
     <style name="TabView" parent="AppTheme">
-        <!-- Customize your theme here. -->
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:actionBarStyle">@style/ActionBarNoShadow</item>
         <item name="actionBarStyle">@style/ActionBarNoShadow</item>

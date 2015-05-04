@@ -11,9 +11,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import cr4zyc4t.cafe24h.model.Category;
@@ -24,21 +30,40 @@ import cr4zyc4t.cafe24h.util.Utils;
 public class ListNewsActivity extends AppCompatActivity {
     private MySlidingTabLayout tabBar;
     private CategoryPagerAdapter pagerAdapter;
-    private int[] colorArray;
-    private int current_color;
-    private List<Category> categoryList;
+    private List<Integer> colors = new ArrayList<>();
+    private List<Category> categoryList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_news);
 
-        categoryList = (List<Category>) getIntent().getSerializableExtra("categoryList");
-
         //Initial Value
-        colorArray = getResources().getIntArray(R.array.color_style);
+        colors.add(getResources().getColor(R.color.bg_1));
+        colors.add(getResources().getColor(R.color.bg_2));
+        colors.add(getResources().getColor(R.color.bg_3));
+        colors.add(getResources().getColor(R.color.bg_4));
+        colors.add(getResources().getColor(R.color.bg_5));
+        colors.add(getResources().getColor(R.color.bg_6));
+
+        String serverResponse = getIntent().getStringExtra("serverResponse");
+        try {
+            JSONObject responseObject = new JSONObject(serverResponse);
+            JSONArray categories = responseObject.getJSONArray("list_category");
+            for (int i = 0; i < categories.length(); i++) {
+                JSONObject ctgObject = categories.getJSONObject(i);
+                Category newCategory = new Category(ctgObject.getInt("id"), ctgObject.getString("title"));
+                Log.i("color", "" + R.color.bg_1);
+                newCategory.setStyleColor(colors.get(categoryList.size() % colors.size()));
+                categoryList.add(newCategory);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         // Setup
+        getSupportActionBar().setTitle("Cafe24h");
+
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         pagerAdapter = new CategoryPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
@@ -52,6 +77,27 @@ public class ListNewsActivity extends AppCompatActivity {
                 return Color.WHITE;
             }
         });
+        tabBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if (positionOffset > 0f && position < (categoryList.size() - 1)) {
+                    int current_color = Utils.blendColors(colors.get((position + 1) % colors.size()), colors.get(position % colors.size()), positionOffset);
+                    setStyleColor(current_color);
+                }
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+
+        setStyleColor(categoryList.get(0).getStyleColor());
     }
 
     @Override
@@ -89,7 +135,7 @@ public class ListNewsActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 2;
+            return categoryList.size();
         }
 
         @Override
