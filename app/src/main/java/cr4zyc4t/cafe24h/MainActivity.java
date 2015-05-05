@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -16,21 +17,28 @@ import cr4zyc4t.cafe24h.util.Utils;
 public class MainActivity extends AppCompatActivity {
     private String Response;
     private boolean splashFinish = false;
+    private AsyncTask<Void, Void, String> asyncTask;
+    private Handler counter;
+    private Runnable finishSplash;
+    private boolean isBackTwice = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new fetchCategories().execute();
+        asyncTask = new fetchCategories();
+        asyncTask.execute();
 
-        new Handler().postDelayed(new Runnable() {
+        counter = new Handler();
+        finishSplash = new Runnable() {
             @Override
             public void run() {
                 splashFinish = true;
                 NextActivity();
             }
-        }, Configs.SPLASH_MINTIME);
+        };
+        counter.postDelayed(finishSplash, Configs.SPLASH_TIME);
     }
 
     private void NextActivity() {
@@ -42,7 +50,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class fetchCategories extends AsyncTask<String, Void, String> {
+    @Override
+    public void onBackPressed() {
+        if (isBackTwice) {
+            asyncTask.cancel(true);
+            counter.removeCallbacks(finishSplash);
+
+            super.onBackPressed();
+        } else {
+            isBackTwice = true;
+            Toast.makeText(this, "Press again to exit", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class fetchCategories extends AsyncTask<Void, Void, String> {
 
         @Override
         protected void onPreExecute() {
@@ -50,8 +71,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(String... params) {
+        protected String doInBackground(Void... params) {
             String url = Configs.GET_CATEGORY_URL;
+            Log.i("Resquest", url);
             try {
                 return Utils.StringRequest(url);
             } catch (IOException e) {

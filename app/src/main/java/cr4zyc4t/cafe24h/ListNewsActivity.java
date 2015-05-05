@@ -2,14 +2,15 @@
 
 package cr4zyc4t.cafe24h;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -23,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cr4zyc4t.cafe24h.model.Category;
-import cr4zyc4t.cafe24h.slidingtab.MySlidingTabLayout;
 import cr4zyc4t.cafe24h.util.Utils;
+import cr4zyc4t.cafe24h.widget.MySlidingTabLayout;
 
 
 public class ListNewsActivity extends AppCompatActivity {
@@ -32,6 +33,21 @@ public class ListNewsActivity extends AppCompatActivity {
     private CategoryPagerAdapter pagerAdapter;
     private List<Integer> colors = new ArrayList<>();
     private List<Category> categoryList = new ArrayList<>();
+
+    private boolean isBackTwice = false;
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this).setMessage("Are you sure to exit?").setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ListNewsActivity.this.supportFinishAfterTransition();
+                    }
+                }).setNegativeButton("No", null)
+                .show();
+//        super.onBackPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +78,10 @@ public class ListNewsActivity extends AppCompatActivity {
         }
 
         // Setup
-        getSupportActionBar().setTitle("Cafe24h");
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(" Cafe24h");
+        actionBar.setIcon(R.drawable.ic_cafe);
+        actionBar.setDisplayShowHomeEnabled(true);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         pagerAdapter = new CategoryPagerAdapter(getSupportFragmentManager());
@@ -122,7 +141,7 @@ public class ListNewsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class CategoryPagerAdapter extends FragmentPagerAdapter {
+    public class CategoryPagerAdapter extends FragmentStatePagerAdapter {
 
         public CategoryPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -130,7 +149,7 @@ public class ListNewsActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return ListNewsFragment.newInstance("" + position, "2");
+            return ListNewsFragment.newInstance(categoryList.get(position).getId(), categoryList.get(position).getStyleColor());
         }
 
         @Override
@@ -145,10 +164,7 @@ public class ListNewsActivity extends AppCompatActivity {
     }
 
     private void setStyleColor(int c) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(Utils.tintColor(c));
-        }
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(c));
+        Utils.setStyleColor(c, this);
         tabBar.setBackgroundColor(c);
     }
 }

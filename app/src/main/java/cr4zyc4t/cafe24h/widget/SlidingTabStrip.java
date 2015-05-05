@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cr4zyc4t.cafe24h.slidingtab;
+package cr4zyc4t.cafe24h.widget;
 
 import android.R;
 import android.content.Context;

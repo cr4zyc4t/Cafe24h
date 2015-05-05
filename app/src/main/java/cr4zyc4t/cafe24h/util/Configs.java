@@ -8,5 +8,7 @@ public class Configs {
     public static final String GET_SUBCATEGORY_URL = "http://content.amobi.vn/api/cafe24h/listsubcategory";
     public static final String GET_CONTENT_BY_CATEGORY_URL = "http://content.amobi.vn/api/cafe24h/getcontentbycategory";
 
-    public static final int SPLASH_MINTIME = 2000;
+    public static final int SPLASH_TIME = 1000;
+
+    public static final int NEWS_PER_LOAD = 10;
 }
