@@ -50,7 +50,11 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
     private RecyclerView newsContainer;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private boolean isLoaded = true;
+    private int pastVisiblesItems, visibleItemCount, totalItemCount;
+
     private int current_offset = 0;
+    private int current_column = 1;
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -91,9 +95,11 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+//        Log.i("ScreenWidthDP", "" + Utils.getScreenWidthInDp(getActivity()));
+
         newsContainer = (RecyclerView) view.findViewById(R.id.list_news_container);
 
-        if (Utils.isTablet(getResources())) {
+        if (Utils.isLandscape(getActivity()) && (Utils.getScreenWidthInDp(getActivity()) > Configs.LARGE_SCREEN_DP)) {
             GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), GRID_COLUMN);
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
@@ -105,12 +111,38 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
                 }
             });
             newsContainer.setLayoutManager(gridLayoutManager);
+            current_column = GRID_COLUMN;
         } else {
             newsContainer.setLayoutManager(new LinearLayoutManager(getActivity()));
         }
 
+
+        newsContainer.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                visibleItemCount = layoutManager.getChildCount();
+                totalItemCount = layoutManager.getItemCount();
+                pastVisiblesItems = layoutManager.findFirstVisibleItemPosition();
+
+                if (isLoaded) {
+                    if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                        isLoaded = false;
+                        getNews();
+                    }
+                }
+            }
+        });
+
         adapter = new ListNews_Adapter(listNews, getActivity());
         adapter.setNewsClickListener(this);
+        adapter.setCurrent_column(current_column);
         newsContainer.setAdapter(adapter);
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
@@ -136,7 +168,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         readnews.putExtra("color", own_color);
 
         ListNews_Adapter.ItemViewHolder viewHolder = (ListNews_Adapter.ItemViewHolder) newsContainer.findViewHolderForItemId(clicked_item.getId());
-        if ((viewHolder != null) && (!Utils.isTablet(this.getResources()))) {
+        if ((viewHolder != null) && (!Utils.isLandscape(getActivity()))) {
             Pair<View, String> titlePair = Pair.create(viewHolder.getTitle(), "title");
             Pair<View, String> timePair = Pair.create(viewHolder.getTimestamp(), "time");
             Pair<View, String> iconPair = Pair.create(viewHolder.getIcon(), "icon");
@@ -210,6 +242,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
                         News news = new News(feed.optString("title"), feed.optString("icon"), feed.optString("source_icon"), feed.optString("time"), feed.optString("description"), feed.optInt("id"));
                         listNews.add(news);
                         current_offset++;
+                        isLoaded = true;
                         adapter.notifyItemInserted(listNews.size() - 1);
                     }
                 }

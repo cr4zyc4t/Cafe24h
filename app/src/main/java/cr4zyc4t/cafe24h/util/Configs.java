@@ -11,4 +11,6 @@ public class Configs {
     public static final int SPLASH_TIME = 1000;
 
     public static final int NEWS_PER_LOAD = 10;
+
+    public static final int LARGE_SCREEN_DP = 650;
 }

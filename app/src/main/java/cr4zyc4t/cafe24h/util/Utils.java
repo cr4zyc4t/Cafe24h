@@ -1,5 +1,6 @@
 package cr4zyc4t.cafe24h.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -20,6 +21,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
@@ -65,13 +67,45 @@ public class Utils {
 //                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
 //    }
 
-    public static boolean isTablet(Resources res) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            return res.getConfiguration().smallestScreenWidthDp >= 600;
-        } else { // for devices without smallestScreenWidthDp reference calculate if device screen is over 600
-            return (res.getDisplayMetrics().widthPixels / res.getDisplayMetrics().density) >= 600;
+//    public static boolean isTablet(Resources res) {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+//            return res.getConfiguration().smallestScreenWidthDp >= 600;
+//        } else { // for devices without smallestScreenWidthDp reference calculate if device screen is over 600
+//            return (res.getDisplayMetrics().widthPixels / res.getDisplayMetrics().density) >= 600;
+//
+//        }
+//    }
 
+    public static int getScreenHeightInDp(Context context) {
+        float height = 0f;
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            Point size = new Point();
+            display.getSize(size);
+            height = size.y;
+        } else {
+            height = display.getHeight();  // deprecated
         }
+        float density = context.getResources().getDisplayMetrics().density;
+
+        return (int) (height / density);
+    }
+
+    public static int getScreenWidthInDp(Context context) {
+        float width = 0;
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            Point size = new Point();
+            display.getSize(size);
+            width = size.x;
+        } else {
+            width = display.getWidth();  // deprecated
+        }
+        float density = context.getResources().getDisplayMetrics().density;
+
+        return (int) (width / density);
     }
 
     public static int getScreenHeight(Context context) {
@@ -102,6 +136,22 @@ public class Utils {
         }
 
         return width;
+    }
+
+    public static Pair getScreenSize(Context context) {
+        Pair<Integer, Integer> screenSize = null;
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            Point size = new Point();
+            display.getSize(size);
+            screenSize = new Pair<>(size.x, size.y);
+        } else {
+            // deprecated
+            screenSize = new Pair<>(display.getWidth(), display.getHeight());
+        }
+
+        return screenSize;
     }
 
     public static int getActionBarHeight(Context context) {
@@ -314,5 +364,24 @@ public class Utils {
             activity.getWindow().setStatusBarColor(Utils.tintColor(c));
         }
         activity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(c));
+    }
+
+    public static int getOrientation(Activity activity) {
+        Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        return display.getRotation();
+    }
+
+    public static boolean isLandscape(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            Point size = new Point();
+            display.getSize(size);
+            if (size.x > size.y) return true;
+        } else {
+            // deprecated
+            if (display.getWidth() > display.getHeight()) return true;
+        }
+        return false;
     }
 }
