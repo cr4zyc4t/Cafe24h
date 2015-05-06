@@ -13,9 +13,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.LinearLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,10 +28,11 @@ import java.util.List;
 
 import cr4zyc4t.cafe24h.model.Category;
 import cr4zyc4t.cafe24h.util.Utils;
+import cr4zyc4t.cafe24h.widget.HidingScrollListener;
 import cr4zyc4t.cafe24h.widget.MySlidingTabLayout;
 
 
-public class ListNewsActivity extends AppCompatActivity implements ListNewsFragment.onNewsScrolledListener {
+public class ListNewsActivity extends AppCompatActivity {
     private MySlidingTabLayout tabBar;
     private CategoryPagerAdapter pagerAdapter;
     private List<Integer> colors = new ArrayList<>();
@@ -38,6 +41,9 @@ public class ListNewsActivity extends AppCompatActivity implements ListNewsFragm
     private boolean isBackTwice = false;
 
     private Toolbar toolbar;
+    private LinearLayout mToolbarContainer;
+    private int mToolbarHeight;
+    private HidingScrollListener hidingScrollListener;
 
     @Override
     public void onBackPressed() {
@@ -57,8 +63,9 @@ public class ListNewsActivity extends AppCompatActivity implements ListNewsFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_news);
 
-//        toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
-//        setSupportActionBar(toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(toolbar);
+        mToolbarHeight = Utils.getToolbarHeight(this);
 
         //Initial Value
         colors.add(getResources().getColor(R.color.bg_1));
@@ -75,7 +82,6 @@ public class ListNewsActivity extends AppCompatActivity implements ListNewsFragm
             for (int i = 0; i < categories.length(); i++) {
                 JSONObject ctgObject = categories.getJSONObject(i);
                 Category newCategory = new Category(ctgObject.getInt("id"), ctgObject.getString("title"));
-                Log.i("color", "" + R.color.bg_1);
                 newCategory.setStyleColor(colors.get(categoryList.size() % colors.size()));
                 categoryList.add(newCategory);
             }
@@ -123,6 +129,25 @@ public class ListNewsActivity extends AppCompatActivity implements ListNewsFragm
         });
 
         setStyleColor(categoryList.get(0).getStyleColor());
+
+        mToolbarContainer = (LinearLayout) findViewById(R.id.toolbar_container);
+        //Add hiding listener
+        hidingScrollListener = new HidingScrollListener(this) {
+            @Override
+            public void onMoved(int distance) {
+                mToolbarContainer.setTranslationY(-distance);
+            }
+
+            @Override
+            public void onShow() {
+                mToolbarContainer.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+            }
+
+            @Override
+            public void onHide() {
+                mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
+            }
+        };
     }
 
     @Override
@@ -147,17 +172,6 @@ public class ListNewsActivity extends AppCompatActivity implements ListNewsFragm
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void OnListNewsScrolled(int dx, int dy) {
-        Log.i("Scroll", "X:" + dx + ", Y:" + dy);
-//        int threshold = getResources().getDimensionPixelSize(R.dimen.scroll_threshold);
-//        if (dy > threshold){
-//            getSupportActionBar().hide();
-//        }else if (dy < -threshold ){
-//            getSupportActionBar().show();
-//        }
-    }
-
     public class CategoryPagerAdapter extends FragmentStatePagerAdapter {
 
         public CategoryPagerAdapter(FragmentManager fm) {
@@ -167,7 +181,9 @@ public class ListNewsActivity extends AppCompatActivity implements ListNewsFragm
         @Override
         public Fragment getItem(int position) {
             ListNewsFragment fragment = ListNewsFragment.newInstance(categoryList.get(position).getId(), categoryList.get(position).getStyleColor());
-            fragment.setOnNewsScrolledListener(ListNewsActivity.this);
+            if (hidingScrollListener != null) {
+                fragment.setHidingScrollListener(hidingScrollListener);
+            }
             return fragment;
         }
 

@@ -29,6 +29,7 @@ import cr4zyc4t.cafe24h.adapter.ListNews_Adapter;
 import cr4zyc4t.cafe24h.model.News;
 import cr4zyc4t.cafe24h.util.Configs;
 import cr4zyc4t.cafe24h.util.Utils;
+import cr4zyc4t.cafe24h.widget.HidingScrollListener;
 
 
 /**
@@ -45,7 +46,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
     private int own_color;
 
     private final int GRID_COLUMN = 2;
-    private List<News> listNews = new ArrayList<News>();
+    private List<News> listNews = new ArrayList<>();
     private ListNews_Adapter adapter;
     private RecyclerView newsContainer;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -55,8 +56,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
 
     private int current_offset = 0;
     private int current_column = 1;
-    private onNewsScrolledListener onScrolledListener;
-
+    private HidingScrollListener hidingScrollListener;
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -77,8 +77,8 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         // Required empty public constructor
     }
 
-    public void setOnNewsScrolledListener(ListNewsFragment.onNewsScrolledListener onScrolledListener) {
-        this.onScrolledListener = onScrolledListener;
+    public void setHidingScrollListener(HidingScrollListener hidingScrollListener) {
+        this.hidingScrollListener = hidingScrollListener;
     }
 
     @Override
@@ -125,7 +125,6 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                onScrolledListener.OnListNewsScrolled(dx, dy);
 
                 LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
                 visibleItemCount = layoutManager.getChildCount();
@@ -140,14 +139,21 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
                 }
             }
         });
+        if (hidingScrollListener != null) {
+            newsContainer.addOnScrollListener(hidingScrollListener);
+        }
 
         adapter = new ListNews_Adapter(listNews, getActivity());
         adapter.setNewsClickListener(this);
         adapter.setCurrent_column(current_column);
         newsContainer.setAdapter(adapter);
 
+
+//        newsContainer.setPadding(newsContainer.getPaddingLeft(), 2*Utils.getActionBarHeight(view.getContext()), newsContainer.getPaddingRight(), newsContainer.getPaddingBottom());
+
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setColorSchemeColors(own_color);
+        swipeRefreshLayout.setProgressViewOffset(false, Utils.getActionBarHeight(view.getContext()), 2 * Utils.getActionBarHeight(view.getContext()));
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -249,9 +255,5 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
             }
 
         }
-    }
-
-    public interface onNewsScrolledListener {
-        void OnListNewsScrolled(int dx, int dy);
     }
 }
