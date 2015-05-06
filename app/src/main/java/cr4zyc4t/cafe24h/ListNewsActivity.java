@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,13 +29,15 @@ import cr4zyc4t.cafe24h.util.Utils;
 import cr4zyc4t.cafe24h.widget.MySlidingTabLayout;
 
 
-public class ListNewsActivity extends AppCompatActivity {
+public class ListNewsActivity extends AppCompatActivity implements ListNewsFragment.onNewsScrolledListener {
     private MySlidingTabLayout tabBar;
     private CategoryPagerAdapter pagerAdapter;
     private List<Integer> colors = new ArrayList<>();
     private List<Category> categoryList = new ArrayList<>();
 
     private boolean isBackTwice = false;
+
+    private Toolbar toolbar;
 
     @Override
     public void onBackPressed() {
@@ -141,6 +144,17 @@ public class ListNewsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void OnListNewsScrolled(int dx, int dy) {
+        Log.i("Scroll", "X:" + dx + ", Y:" + dy);
+//        int threshold = getResources().getDimensionPixelSize(R.dimen.scroll_threshold);
+//        if (dy > threshold){
+//            getSupportActionBar().hide();
+//        }else if (dy < -threshold ){
+//            getSupportActionBar().show();
+//        }
+    }
+
     public class CategoryPagerAdapter extends FragmentStatePagerAdapter {
 
         public CategoryPagerAdapter(FragmentManager fm) {
@@ -149,7 +163,9 @@ public class ListNewsActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return ListNewsFragment.newInstance(categoryList.get(position).getId(), categoryList.get(position).getStyleColor());
+            ListNewsFragment fragment = ListNewsFragment.newInstance(categoryList.get(position).getId(), categoryList.get(position).getStyleColor());
+            fragment.setOnNewsScrolledListener(ListNewsActivity.this);
+            return fragment;
         }
 
         @Override

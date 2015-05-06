@@ -80,14 +80,17 @@ public class ListNews_Adapter extends RecyclerView.Adapter<ListNews_Adapter.Item
             view_holder.description.setText(item.getDescription());
             view_holder.timestamp.setText(item.getTime());
 
-//            int icon_width = Utils.getScreenWidth(mContext) / current_column;
-            int icon_width = Utils.getScreenWidth(mContext) - mContext.getResources().getDimensionPixelSize(R.dimen.card_horizontal_margin) - mContext.getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
-            icon_width = icon_width / current_column;
-//            Log.i("IconWidth", "" + icon_width);
-            Picasso.with(mContext).load(item.getIcon()).resize(icon_width, icon_width / 2).centerCrop().into(view_holder.icon);
+            if (URLUtil.isValidUrl(item.getIcon())) {
+//                int icon_width = Utils.getScreenWidth(mContext) - mContext.getResources().getDimensionPixelSize(R.dimen.card_horizontal_margin) - mContext.getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
+                int icon_width = Utils.getScreenWidth(mContext);
+                icon_width = icon_width / current_column;
+                Picasso.with(mContext).load(item.getIcon()).resize(icon_width, icon_width / 2).centerCrop().into(view_holder.icon);
+            } else {
+                view_holder.icon.setVisibility(View.GONE);
+            }
+
             if (URLUtil.isValidUrl(item.getSource_icon())) {
-//                Log.e("Picasso", item.getTitle() + ": " + item.getSource_icon());
-                Picasso.with(mContext).load(item.getSource_icon()).resize(128, 128).centerCrop().error(R.drawable.cafe24h_icon).into(view_holder.source_icon);
+                Picasso.with(mContext).load(item.getSource_icon()).resize(mContext.getResources().getDimensionPixelSize(R.dimen.source_icon_size), mContext.getResources().getDimensionPixelSize(R.dimen.source_icon_size)).centerCrop().error(R.drawable.cafe24h_icon).into(view_holder.source_icon);
             } else {
                 Log.e("Picasso", item.getId() + ": " + item.getSource_icon());
                 Picasso.with(mContext).load(R.drawable.cafe24h_icon).into(view_holder.source_icon);

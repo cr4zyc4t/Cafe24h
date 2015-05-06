@@ -8,4 +8,8 @@
     <dimen name="title_font_size">17sp</dimen>
     <dimen name="time_font_size">13sp</dimen>
 
+    <dimen name="source_icon_size">60dp</dimen>
+
+    <dimen name="scroll_threshold">24dp</dimen>
+
 </resources>

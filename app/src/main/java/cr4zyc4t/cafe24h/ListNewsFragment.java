@@ -55,6 +55,8 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
 
     private int current_offset = 0;
     private int current_column = 1;
+    private onNewsScrolledListener onScrolledListener;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -73,6 +75,10 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
 
     public ListNewsFragment() {
         // Required empty public constructor
+    }
+
+    public void setOnNewsScrolledListener(ListNewsFragment.onNewsScrolledListener onScrolledListener) {
+        this.onScrolledListener = onScrolledListener;
     }
 
     @Override
@@ -117,15 +123,12 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         }
 
 
-        newsContainer.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-
+        newsContainer.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                onScrolledListener.OnListNewsScrolled(dx, dy);
+
                 LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
                 visibleItemCount = layoutManager.getChildCount();
                 totalItemCount = layoutManager.getItemCount();
@@ -249,5 +252,9 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
             }
 
         }
+    }
+
+    public interface onNewsScrolledListener {
+        void OnListNewsScrolled(int dx, int dy);
     }
 }

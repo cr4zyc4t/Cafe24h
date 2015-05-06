@@ -2,13 +2,17 @@ package cr4zyc4t.cafe24h;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.webkit.URLUtil;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -31,16 +35,34 @@ import cr4zyc4t.cafe24h.widget.ObservableScrollView;
 public class ReadActivity extends AppCompatActivity implements ObservableScrollView.OnScrollListener {
     private final String FETCH_NEWS_URL = "http://content.amobi.vn/api/cafe24h/contentdetail";
 
-    ProgressBar progressBar;
-    Button buttonRetry;
-    WebView body;
-    ActionBar actionBar;
+    private ProgressBar progressBar;
+    private Button buttonRetry;
+    private WebView body;
+    private ActionBar actionBar;
+    private ObservableScrollView scrollView;
+
+    private int mMinRawY = 0;
+    private int mState = STATE.ONSCREEN;
+    private int mQuickReturnHeight;
+    private int mMaxScrollY;
+
+    private Toolbar toolbar;
+    private ImageView icon;
+    private ScrollSettleHandler mScrollSettleHandler = new ScrollSettleHandler();
+
+    private static class STATE {
+        public static final int ONSCREEN = 0;
+        public static final int OFFSCREEN = 1;
+        public static final int RETURNING = 2;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(toolbar);
         //Initial Values
         final News news = (News) getIntent().getSerializableExtra("news");
         int style_color = getIntent().getIntExtra("color", getResources().getColor(R.color.primary));
@@ -50,7 +72,7 @@ public class ReadActivity extends AppCompatActivity implements ObservableScrollV
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
 
-        final ImageView icon = (ImageView) findViewById(R.id.icon);
+        icon = (ImageView) findViewById(R.id.icon);
         ImageView source_icon = (ImageView) findViewById(R.id.source_icon);
         TextView title = (TextView) findViewById(R.id.title);
         TextView time = (TextView) findViewById(R.id.timestamp);
@@ -60,8 +82,17 @@ public class ReadActivity extends AppCompatActivity implements ObservableScrollV
 
         Log.i("Icon", "Width " + icon.getWidth());
 
-        ObservableScrollView scrollView = (ObservableScrollView) findViewById(R.id.scrollView);
+        scrollView = (ObservableScrollView) findViewById(R.id.scrollView);
         scrollView.setOnScrollListener(this);
+        scrollView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                onScrollChanged(scrollView.getScrollY());
+                mMaxScrollY = scrollView.computeVerticalScrollRange()
+                        - scrollView.getHeight();
+                mQuickReturnHeight = toolbar.getHeight();
+            }
+        });
 
         ViewCompat.setTransitionName(title, "title");
         ViewCompat.setTransitionName(time, "time");
@@ -116,18 +147,103 @@ public class ReadActivity extends AppCompatActivity implements ObservableScrollV
     }
 
     @Override
-    public void onScrolled(int l, int t, int oldl, int oldt) {
-//        if (t <= Utils.getActionBarHeight(this)) {
-//            showActionBar();
-//        } else {
-//            if (t > oldt) { // SCROLL DOWN
-//                hideActionBar();
-//            } else {
-//                if ((t < oldt) && (t > 0)) {
-//                    showActionBar();
-//                }
-//            }
-//        }
+    public void onScrollChanged(int scrollY) {
+        scrollY = Math.min(mMaxScrollY, scrollY);
+
+        mScrollSettleHandler.onScroll(scrollY);
+
+        int rawY = icon.getTop() - scrollY;
+        int translationY = 0;
+
+        switch (mState) {
+            case STATE.OFFSCREEN:
+                if (rawY <= mMinRawY) {
+                    mMinRawY = rawY;
+                } else {
+                    mState = STATE.RETURNING;
+                }
+                translationY = rawY;
+                break;
+
+            case STATE.ONSCREEN:
+                if (rawY < -mQuickReturnHeight) {
+                    mState = STATE.OFFSCREEN;
+                    mMinRawY = rawY;
+                }
+                translationY = rawY;
+                break;
+
+            case STATE.RETURNING:
+                translationY = (rawY - mMinRawY) - mQuickReturnHeight;
+                if (translationY > 0) {
+                    translationY = 0;
+                    mMinRawY = rawY - mQuickReturnHeight;
+                }
+
+                if (rawY > 0) {
+                    mState = STATE.ONSCREEN;
+                    translationY = rawY;
+                }
+
+                if (translationY < -mQuickReturnHeight) {
+                    mState = STATE.OFFSCREEN;
+                    mMinRawY = rawY;
+                }
+                break;
+        }
+        toolbar.animate().cancel();
+        toolbar.setTranslationY(translationY + scrollY);
+    }
+
+    @Override
+    public void onDownMotionEvent() {
+        mScrollSettleHandler.setSettleEnabled(false);
+    }
+
+    @Override
+    public void onUpOrCancelMotionEvent() {
+        mScrollSettleHandler.setSettleEnabled(true);
+        mScrollSettleHandler.onScroll(scrollView.getScrollY());
+    }
+
+    private class ScrollSettleHandler extends Handler {
+        private static final int SETTLE_DELAY_MILLIS = 100;
+
+        private int mSettledScrollY = Integer.MIN_VALUE;
+        private boolean mSettleEnabled;
+
+        public void onScroll(int scrollY) {
+            if (mSettledScrollY != scrollY) {
+                // Clear any pending messages and post delayed
+                removeMessages(0);
+                sendEmptyMessageDelayed(0, SETTLE_DELAY_MILLIS);
+                mSettledScrollY = scrollY;
+            }
+        }
+
+        public void setSettleEnabled(boolean settleEnabled) {
+            mSettleEnabled = settleEnabled;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            // Handle the scroll settling.
+            if (STATE.RETURNING == mState && mSettleEnabled) {
+                int mDestTranslationY;
+                if (mSettledScrollY - toolbar.getTranslationY() > mQuickReturnHeight / 2) {
+                    mState = STATE.OFFSCREEN;
+                    mDestTranslationY = Math.max(
+                            mSettledScrollY - mQuickReturnHeight,
+                            icon.getTop());
+                } else {
+                    mDestTranslationY = mSettledScrollY;
+                }
+
+                mMinRawY = icon.getTop() - mQuickReturnHeight - mDestTranslationY;
+                toolbar.animate().translationY(mDestTranslationY);
+            }
+            mSettledScrollY = Integer.MIN_VALUE; // reset
+        }
     }
 
     class getContentAsync extends AsyncTask<String, Void, String> {

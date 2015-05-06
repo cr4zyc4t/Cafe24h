@@ -9,6 +9,8 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
 
+    <color name="listNewsBackground">#E3E3E3</color>
+
     <color name="bg_1">@color/primary</color>
     <color name="bg_2">#E09721</color>
     <color name="bg_3">#008AA7</color>
@@ -16,5 +18,5 @@
     <color name="bg_5">#7E3794</color>
     <color name="bg_6">#0F9D58</color>
 
-    <color name="listNewsBackground">#E3E3E3</color>
+
 </resources>

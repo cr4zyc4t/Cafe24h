@@ -34,14 +34,23 @@ public class ObservableScrollView extends ScrollView {
     }
 
     @Override
+    public int computeVerticalScrollRange() {
+        return super.computeVerticalScrollRange();
+    }
+
+    @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         if (onScrollListener != null) {
-            onScrollListener.onScrolled(l, t, oldl, oldt);
+            onScrollListener.onScrollChanged(t);
         }
         super.onScrollChanged(l, t, oldl, oldt);
     }
 
     public interface OnScrollListener {
-        void onScrolled(int l, int t, int oldl, int oldt);
+        public void onScrollChanged(int scrollY);
+
+        public void onDownMotionEvent();
+
+        public void onUpOrCancelMotionEvent();
     }
 }
