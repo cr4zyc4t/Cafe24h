@@ -57,6 +57,9 @@ public class ListNewsActivity extends AppCompatActivity implements ListNewsFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_news);
 
+//        toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+//        setSupportActionBar(toolbar);
+
         //Initial Value
         colors.add(getResources().getColor(R.color.bg_1));
         colors.add(getResources().getColor(R.color.bg_2));
