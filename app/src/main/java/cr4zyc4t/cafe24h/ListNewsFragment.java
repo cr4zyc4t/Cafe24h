@@ -101,8 +101,6 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//        Log.i("ScreenWidthDP", "" + Utils.getScreenWidthInDp(getActivity()));
-
         newsContainer = (RecyclerView) view.findViewById(R.id.list_news_container);
 
         if (Utils.isLandscape(getActivity()) && (Utils.getScreenWidthInDp(getActivity()) > Configs.LARGE_SCREEN_DP)) {
@@ -153,7 +151,6 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-
                 refreshNews();
             }
         });
