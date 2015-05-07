@@ -3,7 +3,6 @@
     android:id="@+id/swipe_refresh_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="56dp"
     android:background="@color/listNewsBackground"
     tools:context="cr4zyc4t.cafe24h.ListNewsFragment">
 
@@ -16,7 +15,7 @@
         android:layout_alignParentTop="true"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingTop="56dp"
+        android:paddingTop="112dp"
         android:background="@color/listNewsBackground"
         android:clickable="true"
         android:focusable="true"
