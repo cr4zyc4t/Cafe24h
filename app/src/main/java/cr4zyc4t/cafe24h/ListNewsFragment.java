@@ -148,8 +148,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         adapter.setCurrent_column(current_column);
         newsContainer.setAdapter(adapter);
 
-
-//        newsContainer.setPadding(newsContainer.getPaddingLeft(), 2*Utils.getActionBarHeight(view.getContext()), newsContainer.getPaddingRight(), newsContainer.getPaddingBottom());
+        newsContainer.setPadding(newsContainer.getPaddingLeft(), 161, newsContainer.getPaddingRight(), newsContainer.getPaddingBottom());
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setColorSchemeColors(own_color);
