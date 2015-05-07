@@ -34,46 +34,21 @@ import cr4zyc4t.cafe24h.widget.MySlidingTabLayout;
 
 public class ListNewsActivity extends AppCompatActivity {
     private MySlidingTabLayout tabBar;
-    private CategoryPagerAdapter pagerAdapter;
     private List<Integer> colors = new ArrayList<>();
     private List<Category> categoryList = new ArrayList<>();
 
-    private boolean isBackTwice = false;
-
-    private Toolbar toolbar;
     private LinearLayout mToolbarContainer;
     private int mToolbarHeight;
     private HidingScrollListener hidingScrollListener;
-
-    @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this).setMessage("Are you sure to exit?").setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ListNewsActivity.this.supportFinishAfterTransition();
-                    }
-                }).setNegativeButton("No", null)
-                .show();
-//        super.onBackPressed();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_news);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
-        setSupportActionBar(toolbar);
-        mToolbarHeight = Utils.getToolbarHeight(this);
+        setUpActionBar();
 
-        //Initial Value
-        colors.add(getResources().getColor(R.color.bg_1));
-        colors.add(getResources().getColor(R.color.bg_2));
-        colors.add(getResources().getColor(R.color.bg_3));
-        colors.add(getResources().getColor(R.color.bg_4));
-        colors.add(getResources().getColor(R.color.bg_5));
-        colors.add(getResources().getColor(R.color.bg_6));
+        initColorStyle();
 
         String serverResponse = getIntent().getStringExtra("serverResponse");
         try {
@@ -88,15 +63,8 @@ public class ListNewsActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        // Setup
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(" Cafe24h");
-        actionBar.setIcon(R.drawable.ic_cafe);
-        actionBar.setDisplayShowHomeEnabled(true);
-
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        pagerAdapter = new CategoryPagerAdapter(getSupportFragmentManager());
+        CategoryPagerAdapter pagerAdapter = new CategoryPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
 
         tabBar = (MySlidingTabLayout) findViewById(R.id.sliding_tabs);
@@ -128,7 +96,7 @@ public class ListNewsActivity extends AppCompatActivity {
             }
         });
 
-        setStyleColor(categoryList.get(0).getStyleColor());
+
 
         mToolbarContainer = (LinearLayout) findViewById(R.id.toolbar_container);
         //Add hiding listener
@@ -148,6 +116,8 @@ public class ListNewsActivity extends AppCompatActivity {
                 mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
             }
         };
+
+        setStyleColor(categoryList.get(0).getStyleColor());
     }
 
     @Override
@@ -170,6 +140,19 @@ public class ListNewsActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this).setMessage("Are you sure to exit?").setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ListNewsActivity.this.supportFinishAfterTransition();
+                    }
+                }).setNegativeButton("No", null)
+                .show();
+//        super.onBackPressed();
     }
 
     public class CategoryPagerAdapter extends FragmentStatePagerAdapter {
@@ -201,5 +184,27 @@ public class ListNewsActivity extends AppCompatActivity {
     private void setStyleColor(int c) {
         Utils.setStyleColor(c, this);
         tabBar.setBackgroundColor(c);
+    }
+
+    private void initColorStyle() {
+        //Initial Value
+        colors.add(getResources().getColor(R.color.bg_1));
+        colors.add(getResources().getColor(R.color.bg_2));
+        colors.add(getResources().getColor(R.color.bg_3));
+        colors.add(getResources().getColor(R.color.bg_4));
+        colors.add(getResources().getColor(R.color.bg_5));
+        colors.add(getResources().getColor(R.color.bg_6));
+    }
+
+    private void setUpActionBar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(toolbar);
+        mToolbarHeight = Utils.getToolbarHeight(this);
+
+        // Setup
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(" Cafe24h");
+        actionBar.setIcon(R.drawable.ic_cafe);
+        actionBar.setDisplayShowHomeEnabled(true);
     }
 }
