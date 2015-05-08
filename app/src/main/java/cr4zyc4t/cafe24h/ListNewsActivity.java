@@ -2,7 +2,6 @@
 
 package cr4zyc4t.cafe24h;
 
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -63,7 +61,7 @@ public class ListNewsActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         CategoryPagerAdapter pagerAdapter = new CategoryPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
 
@@ -92,7 +90,6 @@ public class ListNewsActivity extends AppCompatActivity {
 
             @Override
             public void onPageScrollStateChanged(int i) {
-
             }
         });
 
@@ -108,12 +105,12 @@ public class ListNewsActivity extends AppCompatActivity {
 
             @Override
             public void onShow() {
-                mToolbarContainer.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+                showActionBar();
             }
 
             @Override
             public void onHide() {
-                mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
+                hideActionBar();
             }
         };
 
@@ -144,15 +141,15 @@ public class ListNewsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this).setMessage("Are you sure to exit?").setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ListNewsActivity.this.supportFinishAfterTransition();
-                    }
-                }).setNegativeButton("No", null)
-                .show();
-//        super.onBackPressed();
+//        new AlertDialog.Builder(this).setMessage("Are you sure to exit?").setCancelable(false)
+//                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        ListNewsActivity.this.supportFinishAfterTransition();
+//                    }
+//                }).setNegativeButton("No", null)
+//                .show();
+        super.onBackPressed();
     }
 
     public class CategoryPagerAdapter extends FragmentStatePagerAdapter {
@@ -203,8 +200,15 @@ public class ListNewsActivity extends AppCompatActivity {
 
         // Setup
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(" Cafe24h");
         actionBar.setIcon(R.drawable.ic_cafe);
         actionBar.setDisplayShowHomeEnabled(true);
+    }
+
+    private void showActionBar() {
+        mToolbarContainer.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+    }
+
+    private void hideActionBar() {
+        mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
     }
 }

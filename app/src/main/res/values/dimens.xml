@@ -9,7 +9,8 @@
     <dimen name="time_font_size">13sp</dimen>
 
     <dimen name="source_icon_size">60dp</dimen>
-
-    <dimen name="scroll_threshold">24dp</dimen>
-
+    <dimen name="news_header_padding">16dp</dimen>
+    <dimen name="news_header_placeholder">92dp</dimen>
+    <!-- = source_icon_size + 2 * news_header_padding -->
+    <dimen name="news_header_elevation">8dp</dimen>
 </resources>

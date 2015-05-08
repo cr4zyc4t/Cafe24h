@@ -2,6 +2,7 @@ package cr4zyc4t.cafe24h.widget;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import cr4zyc4t.cafe24h.util.Utils;
 
@@ -53,6 +54,7 @@ public abstract class HidingScrollListener extends RecyclerView.OnScrollListener
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
 
+        Log.i("RecyclerView", "dx: " + dx + ", dy: " + dy);
         clipToolbarOffset();
         onMoved(mToolbarOffset);
 

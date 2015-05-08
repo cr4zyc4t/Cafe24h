@@ -160,9 +160,5 @@ public class ListNews_Adapter extends RecyclerView.Adapter<ListNews_Adapter.Item
         public View getTimestamp() {
             return timestamp;
         }
-
-        public View getSource_icon() {
-            return source_icon;
-        }
     }
 }

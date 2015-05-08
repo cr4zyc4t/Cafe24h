@@ -103,7 +103,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
 
         newsContainer = (RecyclerView) view.findViewById(R.id.list_news_container);
 
-        if (Utils.isLandscape(getActivity()) && (Utils.getScreenWidthInDp(getActivity()) > Configs.LARGE_SCREEN_DP)) {
+        if (Utils.isLandscape(getActivity()) && (Utils.getScreenWidthInDp(view.getContext()) > Configs.LARGE_SCREEN_DP)) {
             GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), GRID_COLUMN);
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
@@ -117,7 +117,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
             newsContainer.setLayoutManager(gridLayoutManager);
             current_column = GRID_COLUMN;
         } else {
-            newsContainer.setLayoutManager(new LinearLayoutManager(getActivity()));
+            newsContainer.setLayoutManager(new LinearLayoutManager(view.getContext()));
         }
 
 
@@ -148,7 +148,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         adapter.setCurrent_column(current_column);
         newsContainer.setAdapter(adapter);
 
-        newsContainer.setPadding(newsContainer.getPaddingLeft(), 161, newsContainer.getPaddingRight(), newsContainer.getPaddingBottom());
+//        newsContainer.setPadding(newsContainer.getPaddingLeft(), 161, newsContainer.getPaddingRight(), newsContainer.getPaddingBottom());
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setColorSchemeColors(own_color);
@@ -168,7 +168,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         News clicked_item = listNews.get(position);
         Log.i("Action", " Click " + clicked_item.getTitle());
 
-        Intent readnews = new Intent(getActivity(), ReadActivity.class);
+        Intent readnews = new Intent(getActivity(), ReadNewsActivity.class);
         readnews.putExtra("news", clicked_item);
         readnews.putExtra("color", own_color);
 
@@ -177,7 +177,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
             Pair<View, String> titlePair = Pair.create(viewHolder.getTitle(), "title");
             Pair<View, String> timePair = Pair.create(viewHolder.getTimestamp(), "time");
             Pair<View, String> iconPair = Pair.create(viewHolder.getIcon(), "icon");
-            Pair<View, String> sourcePair = Pair.create(viewHolder.getSource_icon(), "source");
+            Pair<View, String> sourcePair = Pair.create(viewHolder.getSourceIcon(), "source");
 
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), titlePair, timePair, iconPair, sourcePair);
             ActivityCompat.startActivity(getActivity(), readnews, options.toBundle());

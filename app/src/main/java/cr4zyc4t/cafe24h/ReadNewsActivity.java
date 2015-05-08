@@ -1,14 +1,11 @@
 package cr4zyc4t.cafe24h;
 
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +15,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -33,45 +31,30 @@ import cr4zyc4t.cafe24h.util.Utils;
 import cr4zyc4t.cafe24h.widget.ObservableScrollView;
 
 
-public class ReadActivity extends AppCompatActivity implements ObservableScrollView.OnScrollListener {
+public class ReadNewsActivity extends AppCompatActivity implements ObservableScrollView.OnScrollListener {
     private final String FETCH_NEWS_URL = "http://content.amobi.vn/api/cafe24h/contentdetail";
 
     private ProgressBar progressBar;
     private Button buttonRetry;
     private WebView body;
-    private ActionBar actionBar;
     private ObservableScrollView scrollView;
-
-    private int mMinRawY = 0;
-    private int mState = STATE.ONSCREEN;
-    private int mQuickReturnHeight;
-    private int mMaxScrollY;
-
-    private Toolbar toolbar;
     private ImageView icon;
-    private ScrollSettleHandler mScrollSettleHandler = new ScrollSettleHandler();
-
-    private static class STATE {
-        public static final int ONSCREEN = 0;
-        public static final int OFFSCREEN = 1;
-        public static final int RETURNING = 2;
-    }
+    private LinearLayout stickyHeader;
+    private View placeholder;
+    private int placeholder_top;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_read);
+        setContentView(R.layout.activity_read_sticky);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
-        setSupportActionBar(toolbar);
         //Initial Values
         final News news = (News) getIntent().getSerializableExtra("news");
         int style_color = getIntent().getIntExtra("color", getResources().getColor(R.color.primary));
-        Utils.setStyleColor(style_color, this);
+//        Utils.setStyleColor(style_color, this);
 
-        actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
+        stickyHeader = (LinearLayout) findViewById(R.id.sticky_header);
+        placeholder = findViewById(R.id.placeholder);
 
         icon = (ImageView) findViewById(R.id.icon);
         ImageView source_icon = (ImageView) findViewById(R.id.source_icon);
@@ -96,9 +79,6 @@ public class ReadActivity extends AppCompatActivity implements ObservableScrollV
             @Override
             public void onGlobalLayout() {
                 onScrollChanged(scrollView.getScrollY());
-                mMaxScrollY = scrollView.computeVerticalScrollRange()
-                        - scrollView.getHeight();
-                mQuickReturnHeight = toolbar.getHeight();
             }
         });
 
@@ -127,18 +107,6 @@ public class ReadActivity extends AppCompatActivity implements ObservableScrollV
         });
     }
 
-    private void hideActionBar() {
-        if (actionBar.isShowing()) {
-            actionBar.hide();
-        }
-    }
-
-    private void showActionBar() {
-        if (!actionBar.isShowing()) {
-            actionBar.show();
-        }
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -156,102 +124,36 @@ public class ReadActivity extends AppCompatActivity implements ObservableScrollV
 
     @Override
     public void onScrollChanged(int scrollY) {
-        scrollY = Math.min(mMaxScrollY, scrollY);
+        placeholder_top = placeholder.getTop();
+        Log.i("Run", "placeholder top :" + placeholder_top + ", scrollY: " + scrollY);
+        stickyHeader.setTranslationY(Math.max(placeholder_top, scrollY));
 
-        mScrollSettleHandler.onScroll(scrollY);
-
-        int rawY = icon.getTop() - scrollY;
-        int translationY = 0;
-
-        switch (mState) {
-            case STATE.OFFSCREEN:
-                if (rawY <= mMinRawY) {
-                    mMinRawY = rawY;
-                } else {
-                    mState = STATE.RETURNING;
-                }
-                translationY = rawY;
-                break;
-
-            case STATE.ONSCREEN:
-                if (rawY < -mQuickReturnHeight) {
-                    mState = STATE.OFFSCREEN;
-                    mMinRawY = rawY;
-                }
-                translationY = rawY;
-                break;
-
-            case STATE.RETURNING:
-                translationY = (rawY - mMinRawY) - mQuickReturnHeight;
-                if (translationY > 0) {
-                    translationY = 0;
-                    mMinRawY = rawY - mQuickReturnHeight;
-                }
-
-                if (rawY > 0) {
-                    mState = STATE.ONSCREEN;
-                    translationY = rawY;
-                }
-
-                if (translationY < -mQuickReturnHeight) {
-                    mState = STATE.OFFSCREEN;
-                    mMinRawY = rawY;
-                }
-                break;
+        if (placeholder_top < scrollY) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                stickyHeader.setElevation(getResources().getDimension(R.dimen.news_header_elevation));
+            } else {
+                stickyHeader.setBackgroundResource(R.color.listNewsBackground);
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                stickyHeader.setElevation(0);
+            } else {
+                stickyHeader.setBackgroundResource(android.R.color.white);
+            }
         }
-        toolbar.animate().cancel();
-        toolbar.setTranslationY(translationY + scrollY);
+
+        //Paralax icon :D
+        if (scrollY <= (Utils.getScreenWidth(this) / 2)) {
+            icon.setTranslationY(scrollY / 2);
+        }
     }
 
     @Override
     public void onDownMotionEvent() {
-        mScrollSettleHandler.setSettleEnabled(false);
     }
 
     @Override
     public void onUpOrCancelMotionEvent() {
-        mScrollSettleHandler.setSettleEnabled(true);
-        mScrollSettleHandler.onScroll(scrollView.getScrollY());
-    }
-
-    private class ScrollSettleHandler extends Handler {
-        private static final int SETTLE_DELAY_MILLIS = 100;
-
-        private int mSettledScrollY = Integer.MIN_VALUE;
-        private boolean mSettleEnabled;
-
-        public void onScroll(int scrollY) {
-            if (mSettledScrollY != scrollY) {
-                // Clear any pending messages and post delayed
-                removeMessages(0);
-                sendEmptyMessageDelayed(0, SETTLE_DELAY_MILLIS);
-                mSettledScrollY = scrollY;
-            }
-        }
-
-        public void setSettleEnabled(boolean settleEnabled) {
-            mSettleEnabled = settleEnabled;
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            // Handle the scroll settling.
-            if (STATE.RETURNING == mState && mSettleEnabled) {
-                int mDestTranslationY;
-                if (mSettledScrollY - toolbar.getTranslationY() > mQuickReturnHeight / 2) {
-                    mState = STATE.OFFSCREEN;
-                    mDestTranslationY = Math.max(
-                            mSettledScrollY - mQuickReturnHeight,
-                            icon.getTop());
-                } else {
-                    mDestTranslationY = mSettledScrollY;
-                }
-
-                mMinRawY = icon.getTop() - mQuickReturnHeight - mDestTranslationY;
-                toolbar.animate().translationY(mDestTranslationY);
-            }
-            mSettledScrollY = Integer.MIN_VALUE; // reset
-        }
     }
 
     class getContentAsync extends AsyncTask<Integer, Void, String> {
@@ -265,24 +167,6 @@ public class ReadActivity extends AppCompatActivity implements ObservableScrollV
 
         @Override
         protected String doInBackground(Integer... params) {
-//            HttpClient httpClient = new DefaultHttpClient();
-//            HttpGet request = new HttpGet(FETCH_NEWS_URL + "?content_id=" + params[0]);
-//
-//            try {
-//                HttpResponse httpResponse = httpClient.execute(request);
-//                InputStream inputStream = httpResponse.getEntity().getContent();
-//                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-//                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-//                StringBuilder stringBuilder = new StringBuilder();
-//                String bufferedStrChunk = null;
-//                while ((bufferedStrChunk = bufferedReader.readLine()) != null) {
-//                    stringBuilder.append(bufferedStrChunk);
-//                }
-//                return stringBuilder.toString();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            return null;
             String url = FETCH_NEWS_URL + "?content_id=" + params[0];
             Log.d("Link", url);
             try {
