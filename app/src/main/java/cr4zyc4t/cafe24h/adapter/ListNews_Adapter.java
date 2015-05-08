@@ -78,7 +78,7 @@ public class ListNews_Adapter extends RecyclerView.Adapter<ListNews_Adapter.Item
 
             view_holder.title.setText(item.getTitle());
             view_holder.description.setText(item.getDescription());
-            view_holder.timestamp.setText(item.getTime());
+            view_holder.timestamp.setText(Utils.calcTime(item.getTime()));
 
             if (URLUtil.isValidUrl(item.getIcon())) {
 //                int icon_width = Utils.getScreenWidth(mContext) - mContext.getResources().getDimensionPixelSize(R.dimen.card_horizontal_margin) - mContext.getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);

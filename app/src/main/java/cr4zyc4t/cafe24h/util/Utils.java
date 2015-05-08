@@ -33,9 +33,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import cr4zyc4t.cafe24h.R;
@@ -46,6 +48,9 @@ import cr4zyc4t.cafe24h.R;
  * Created by neokree on 06/01/15.
  */
 public class Utils {
+    private static final long MINUTE = 60000;
+    private static final long HOUR = 3600000;
+    private static final long DAY = 86400000;
 
     public static int getToolbarHeight(Context context) {
         final TypedArray styledAttributes = context.getTheme().obtainStyledAttributes(
@@ -55,6 +60,7 @@ public class Utils {
 
         return toolbarHeight;
     }
+
     public static int getDrawerWidth(Resources res) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
 
@@ -352,7 +358,7 @@ public class Utils {
     }
 
     // Reads an InputStream and converts it to a String.
-    private static String readIt(InputStream stream) throws IOException, UnsupportedEncodingException {
+    private static String readIt(InputStream stream) throws IOException {
         StringBuilder response = new StringBuilder();
         BufferedReader reader = null;
         reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
@@ -394,5 +400,37 @@ public class Utils {
             if (display.getWidth() > display.getHeight()) return true;
         }
         return false;
+    }
+
+    public static Date parseDate(String date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            return dateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String calcTime(String dateString) {
+        Date date = parseDate(dateString);
+        if (date != null) {
+//            long currentTime = new GregorianCalendar().getTime().getTime();
+            long currentTime = System.currentTimeMillis();
+            long timeDiffMili = currentTime - date.getTime();
+            if (timeDiffMili < 0)
+                return "0s trước";
+            else if (timeDiffMili < MINUTE)
+                return (((int) (timeDiffMili / 1000)) + "s trước");
+            else if (timeDiffMili < HOUR)
+                return (((int) (timeDiffMili / MINUTE)) + " phút trước");
+            else if (timeDiffMili < DAY)
+                return (((int) (timeDiffMili / HOUR)) + " giờ trước");
+            else {
+                int day_count = (int) (timeDiffMili / DAY);
+                if (day_count <= 4) return day_count + " ngày trước";
+            }
+        }
+        return dateString;
     }
 }
