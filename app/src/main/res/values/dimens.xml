@@ -13,4 +13,5 @@
     <dimen name="news_header_placeholder">92dp</dimen>
     <!-- = source_icon_size + 2 * news_header_padding -->
     <dimen name="news_header_elevation">8dp</dimen>
+    <dimen name="news_icon_width_tablet_mode">360dp</dimen>
 </resources>

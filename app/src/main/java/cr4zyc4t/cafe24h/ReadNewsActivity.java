@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,24 +43,30 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
     private LinearLayout stickyHeader;
     private View placeholder;
     private int placeholder_top;
+    private News news;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read_sticky);
 
-        //Initial Values
-        final News news = (News) getIntent().getSerializableExtra("news");
-        int style_color = getIntent().getIntExtra("color", getResources().getColor(R.color.primary));
-//        Utils.setStyleColor(style_color, this);
+        news = (News) getIntent().getSerializableExtra("news");
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            int style_color = getIntent().getIntExtra("color", getResources().getColor(R.color.primary));
+            Utils.setStyleColor(style_color, this);
+        }
 
         stickyHeader = (LinearLayout) findViewById(R.id.sticky_header);
         placeholder = findViewById(R.id.placeholder);
 
         icon = (ImageView) findViewById(R.id.icon);
-        ImageView source_icon = (ImageView) findViewById(R.id.source_icon);
-        TextView title = (TextView) findViewById(R.id.title);
-        TextView time = (TextView) findViewById(R.id.timestamp);
+
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         buttonRetry = (Button) findViewById(R.id.buttonRetry);
         body = (WebView) findViewById(R.id.body);
@@ -67,7 +74,6 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
         body.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-//                return super.shouldOverrideUrlLoading(view, url);
                 return true;
             }
         });
@@ -82,20 +88,7 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
             }
         });
 
-        ViewCompat.setTransitionName(title, "title");
-        ViewCompat.setTransitionName(time, "time");
-        ViewCompat.setTransitionName(icon, "icon");
-        ViewCompat.setTransitionName(source_icon, "source");
-
-        final int icon_width = Utils.getScreenWidth(this);
-        Picasso.with(this).load(news.getIcon()).resize(icon_width, icon_width / 2).centerCrop().into(icon);
-        if (URLUtil.isValidUrl(news.getSource_icon())) {
-            Picasso.with(this).load(news.getSource_icon()).resize(128, 128).centerCrop().error(R.drawable.cafe24h_icon).into(source_icon);
-        }
-
-        title.setText(news.getTitle());
-        time.setText(news.getTime());
-
+        initFirstView();
 
         new getContentAsync().execute(news.getId());
 
@@ -124,27 +117,29 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
 
     @Override
     public void onScrollChanged(int scrollY) {
-        placeholder_top = placeholder.getTop();
-        Log.i("Run", "placeholder top :" + placeholder_top + ", scrollY: " + scrollY);
-        stickyHeader.setTranslationY(Math.max(placeholder_top, scrollY));
+        if (placeholder != null) {   // Only in tablet mode
+            placeholder_top = placeholder.getTop();
+            Log.i("Run", "placeholder top :" + placeholder_top + ", scrollY: " + scrollY);
+            stickyHeader.setTranslationY(Math.max(placeholder_top, scrollY));
 
-        if (placeholder_top < scrollY) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                stickyHeader.setElevation(getResources().getDimension(R.dimen.news_header_elevation));
+            if (placeholder_top < scrollY) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    stickyHeader.setElevation(getResources().getDimension(R.dimen.news_header_elevation));
+                } else {
+                    stickyHeader.setBackgroundResource(R.color.news_header_background_highlight);
+                }
             } else {
-                stickyHeader.setBackgroundResource(R.color.listNewsBackground);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    stickyHeader.setElevation(0);
+                } else {
+                    stickyHeader.setBackgroundResource(android.R.color.white);
+                }
             }
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                stickyHeader.setElevation(0);
-            } else {
-                stickyHeader.setBackgroundResource(android.R.color.white);
-            }
-        }
 
-        //Paralax icon :D
-        if (scrollY <= (Utils.getScreenWidth(this) / 2)) {
-            icon.setTranslationY(scrollY / 2);
+            //Paralax icon :D
+            if (scrollY <= (Utils.getScreenWidth(this) * 0.5f)) {
+                icon.setTranslationY(scrollY * 0.5f);
+            }
         }
     }
 
@@ -198,5 +193,41 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
             }
             progressBar.setVisibility(View.GONE);
         }
+    }
+
+    private void initFirstView() {
+        //Initial Values
+        TextView description = (TextView) findViewById(R.id.description);
+        ImageView source_icon = (ImageView) findViewById(R.id.source_icon);
+        TextView title = (TextView) findViewById(R.id.title);
+        TextView time = (TextView) findViewById(R.id.timestamp);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ViewCompat.setTransitionName(title, "title");
+            ViewCompat.setTransitionName(time, "time");
+            ViewCompat.setTransitionName(icon, "icon");
+            ViewCompat.setTransitionName(source_icon, "source");
+        }
+
+        int icon_width = Utils.getScreenWidth(this);
+        if (placeholder == null) { //Tablet Mode
+            icon_width = (int) (icon_width * 0.33f);
+
+            LinearLayout firstColumn = (LinearLayout) findViewById(R.id.first_column);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(icon_width, LinearLayout.LayoutParams.MATCH_PARENT);
+            firstColumn.setLayoutParams(layoutParams);
+
+            LinearLayout.LayoutParams iconLayoutParams = new LinearLayout.LayoutParams(icon_width, (int) (icon_width * 0.5f));
+            icon.setLayoutParams(iconLayoutParams);
+        }
+
+        Picasso.with(this).load(news.getIcon()).resize(icon_width, (int) (icon_width * 0.5f)).centerCrop().into(icon);
+        if (URLUtil.isValidUrl(news.getSource_icon())) {
+            Picasso.with(this).load(news.getSource_icon()).resize(128, 128).centerCrop().error(R.drawable.cafe24h_icon).into(source_icon);
+        }
+
+        title.setText(news.getTitle());
+        time.setText(news.getTime());
+        description.setText(news.getDescription());
     }
 }
