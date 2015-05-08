@@ -433,4 +433,8 @@ public class Utils {
         }
         return dateString;
     }
+
+    public static int getTabBarHeight(Context context) {
+        return context.getResources().getDimensionPixelSize(R.dimen.tab_title_font_size) + 2 * context.getResources().getDimensionPixelSize(R.dimen.tab_title_padding);
+    }
 }

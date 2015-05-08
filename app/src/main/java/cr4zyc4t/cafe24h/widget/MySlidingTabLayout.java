@@ -172,7 +172,8 @@ public class MySlidingTabLayout extends HorizontalScrollView {
     protected TextView createDefaultTabView(Context context) {
         TextView textView = new TextView(context);
         textView.setGravity(Gravity.CENTER);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, TAB_VIEW_TEXT_SIZE_SP);
+//        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, TAB_VIEW_TEXT_SIZE_SP);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.tab_title_font_size));
         textView.setLines(1);
         textView.setTypeface(Typeface.DEFAULT_BOLD);
         textView.setLayoutParams(new LinearLayout.LayoutParams(
@@ -184,7 +185,8 @@ public class MySlidingTabLayout extends HorizontalScrollView {
         textView.setBackgroundResource(outValue.resourceId);
         textView.setAllCaps(true);
 
-        int padding = (int) (TAB_VIEW_PADDING_DIPS * getResources().getDisplayMetrics().density);
+//        int padding = (int) (TAB_VIEW_PADDING_DIPS * getResources().getDisplayMetrics().density);
+        int padding = getResources().getDimensionPixelSize(R.dimen.tab_title_padding);
         textView.setPadding(padding, padding, padding, padding);
 
         return textView;

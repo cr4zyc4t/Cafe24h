@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AccelerateInterpolator;
@@ -197,6 +198,8 @@ public class ListNewsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
         mToolbarHeight = Utils.getToolbarHeight(this);
+        Log.i("Toolbar", "" + mToolbarHeight);
+        Log.i("Toolbar", "ActionBar " + Utils.getActionBarHeight(this));
 
         // Setup
         ActionBar actionBar = getSupportActionBar();
