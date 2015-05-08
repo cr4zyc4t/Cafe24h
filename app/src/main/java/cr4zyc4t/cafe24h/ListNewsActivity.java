@@ -39,6 +39,7 @@ public class ListNewsActivity extends AppCompatActivity {
     private LinearLayout mToolbarContainer;
     private int mToolbarHeight;
     private HidingScrollListener hidingScrollListener;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +92,9 @@ public class ListNewsActivity extends AppCompatActivity {
 
             @Override
             public void onPageScrollStateChanged(int i) {
+                Log.i("Toolbar", "" + mToolbarHeight);
+                Log.i("Toolbar", "Real " + toolbar.getBottom());
+                Log.i("Toolbar", "ActionBar " + Utils.getActionBarHeight(ListNewsActivity.this));
             }
         });
 
@@ -195,11 +199,9 @@ public class ListNewsActivity extends AppCompatActivity {
     }
 
     private void setUpActionBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
         mToolbarHeight = Utils.getToolbarHeight(this);
-        Log.i("Toolbar", "" + mToolbarHeight);
-        Log.i("Toolbar", "ActionBar " + Utils.getActionBarHeight(this));
 
         // Setup
         ActionBar actionBar = getSupportActionBar();

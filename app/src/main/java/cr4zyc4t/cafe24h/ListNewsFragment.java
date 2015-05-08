@@ -148,7 +148,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         adapter.setCurrent_column(current_column);
         newsContainer.setAdapter(adapter);
 
-        int headerHeight = Utils.getToolbarHeight(view.getContext()) + Utils.getTabBarHeight(view.getContext()) + view.getResources().getDimensionPixelSize(R.dimen.tab_indicator);
+        int headerHeight = Utils.getToolbarHeight(view.getContext()) + Utils.getTabBarHeight(view.getContext());
         Log.i("padding", "old: " + newsContainer.getPaddingTop() + ", new: " + headerHeight);
         newsContainer.setPadding(newsContainer.getPaddingLeft(), headerHeight, newsContainer.getPaddingRight(), newsContainer.getPaddingBottom());
 

@@ -23,7 +23,6 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
@@ -171,13 +170,13 @@ public class Utils {
         return screenSize;
     }
 
-    public static int getActionBarHeight(Context context) {
-        TypedValue tv = new TypedValue();
-        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            return TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
-        }
-        return 0;
-    }
+//    public static int getActionBarHeight(Context context) {
+//        TypedValue tv = new TypedValue();
+//        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+//            return TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
+//        }
+//        return 0;
+//    }
 
     public static Point getUserPhotoSize(Resources res) {
         int size = (int) (64 * res.getDisplayMetrics().density);
@@ -435,6 +434,6 @@ public class Utils {
     }
 
     public static int getTabBarHeight(Context context) {
-        return context.getResources().getDimensionPixelSize(R.dimen.tab_title_font_size) + 2 * context.getResources().getDimensionPixelSize(R.dimen.tab_title_padding);
+        return context.getResources().getDimensionPixelSize(R.dimen.tab_title_font_size) + 2 * context.getResources().getDimensionPixelSize(R.dimen.tab_title_padding) + context.getResources().getDimensionPixelSize(R.dimen.tab_indicator);
     }
 }
