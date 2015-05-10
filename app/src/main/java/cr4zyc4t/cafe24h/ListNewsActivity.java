@@ -6,12 +6,11 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AccelerateInterpolator;
@@ -92,9 +91,6 @@ public class ListNewsActivity extends AppCompatActivity {
 
             @Override
             public void onPageScrollStateChanged(int i) {
-                Log.i("Toolbar", "" + mToolbarHeight);
-                Log.i("Toolbar", "Real " + toolbar.getBottom());
-                Log.i("Toolbar", "ActionBar " + Utils.getActionBarHeight(ListNewsActivity.this));
             }
         });
 
@@ -157,7 +153,7 @@ public class ListNewsActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
-    public class CategoryPagerAdapter extends FragmentStatePagerAdapter {
+    public class CategoryPagerAdapter extends FragmentPagerAdapter {
 
         public CategoryPagerAdapter(FragmentManager fm) {
             super(fm);
