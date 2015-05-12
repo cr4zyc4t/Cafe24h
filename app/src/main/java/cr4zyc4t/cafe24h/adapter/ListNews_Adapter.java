@@ -82,7 +82,7 @@ public class ListNews_Adapter extends RecyclerView.Adapter<ListNews_Adapter.Item
 
             if (URLUtil.isValidUrl(item.getIcon())) {
 //                int icon_width = Utils.getScreenWidth(mContext) - mContext.getResources().getDimensionPixelSize(R.dimen.card_horizontal_margin) - mContext.getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
-                int icon_width = Utils.getScreenWidth(mContext);
+                int icon_width = Utils.getScreenWidth(mContext) - 2 * mContext.getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
                 icon_width = icon_width / current_column;
                 Picasso.with(mContext).load(item.getIcon()).resize(icon_width, icon_width / 2).centerCrop().into(view_holder.icon);
             } else {

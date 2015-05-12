@@ -57,7 +57,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
     private int current_offset = 0;
     private int current_column = 1;
     private HidingScrollListener hidingScrollListener;
-    private int topOffsetAtBegin = 0;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -80,18 +80,6 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
 
     public void setHidingScrollListener(HidingScrollListener hidingScrollListener) {
         this.hidingScrollListener = hidingScrollListener;
-    }
-
-    public void setTopOffsetAtBegin(int topOffsetAtBegin) {
-        if (this.topOffsetAtBegin == 0) {
-            this.topOffsetAtBegin = topOffsetAtBegin;
-
-            if ((newsContainer != null) && (listNews.size() > 0)) {
-                Log.i("TopOffset", "" + topOffsetAtBegin);
-                newsContainer.scrollBy(0, topOffsetAtBegin);
-            }
-        }
-
     }
 
     @Override

@@ -412,6 +412,7 @@ public class Utils {
     }
 
     public static String calcTime(String dateString) {
+        SimpleDateFormat VNDateFormat = new SimpleDateFormat("HH:mm dd/MM/yyyy");
         Date date = parseDate(dateString);
         if (date != null) {
 //            long currentTime = new GregorianCalendar().getTime().getTime();
@@ -427,8 +428,9 @@ public class Utils {
                 return (((int) (timeDiffMili / HOUR)) + " giờ trước");
             else {
                 int day_count = (int) (timeDiffMili / DAY);
-                if (day_count <= 4) return day_count + " ngày trước";
+                if (day_count <= 3) return day_count + " ngày trước";
             }
+            return VNDateFormat.format(date);
         }
         return dateString;
     }

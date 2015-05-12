@@ -227,7 +227,7 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
         }
 
         title.setText(news.getTitle());
-        time.setText(news.getTime());
+        time.setText(Utils.calcTime(news.getTime()));
         description.setText(news.getDescription());
     }
 }
