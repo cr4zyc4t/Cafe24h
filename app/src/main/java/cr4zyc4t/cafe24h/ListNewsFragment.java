@@ -39,10 +39,12 @@ import cr4zyc4t.cafe24h.widget.HidingScrollListener;
  */
 public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsClickListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String CATEGORY_ID = "category_id";
+    private static final String TYPE = "type_request";
+    private static final String TARGET_ID = "target_id";
     private static final String COLOR = "color";
 
-    private int category_id;
+    private int type_request;
+    private int target_id;
     private int own_color;
 
     private final int GRID_COLUMN = 2;
@@ -65,11 +67,12 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
      * @param param1 Category_id.
      * @return A new instance of fragment ListNewsFragment.
      */
-    public static ListNewsFragment newInstance(int param1, int param2) {
+    public static ListNewsFragment newInstance(int param1, int param2, int param3) {
         ListNewsFragment fragment = new ListNewsFragment();
         Bundle args = new Bundle();
-        args.putInt(CATEGORY_ID, param1);
-        args.putInt(COLOR, param2);
+        args.putInt(TYPE, param1);
+        args.putInt(TARGET_ID, param2);
+        args.putInt(COLOR, param3);
         fragment.setArguments(args);
         return fragment;
     }
@@ -86,7 +89,8 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            category_id = getArguments().getInt(CATEGORY_ID);
+            type_request = getArguments().getInt(TYPE);
+            target_id = getArguments().getInt(TARGET_ID);
             own_color = getArguments().getInt(COLOR);
         }
     }
@@ -211,7 +215,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
 
         @Override
         protected String doInBackground(Void... params) {
-            String url = Configs.GET_CONTENT_BY_CATEGORY_URL + "?category_id=" + category_id + "&limit=" + Configs.NEWS_PER_LOAD + "&offset=" + current_offset;
+            String url = Configs.getContentURL(type_request, target_id, Configs.NEWS_PER_LOAD, current_offset);
             Log.i("Request", url);
             try {
                 return Utils.StringRequest(url);

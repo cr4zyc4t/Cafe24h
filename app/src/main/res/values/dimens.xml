@@ -19,4 +19,5 @@
     <dimen name="tab_title_font_size">14sp</dimen>
     <dimen name="tab_title_padding">15sp</dimen>
     <dimen name="tab_indicator">3dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
 </resources>

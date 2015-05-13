@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cr4zyc4t.cafe24h.model.Category;
+import cr4zyc4t.cafe24h.util.Configs;
 import cr4zyc4t.cafe24h.util.Utils;
 import cr4zyc4t.cafe24h.widget.HidingScrollListener;
 import cr4zyc4t.cafe24h.widget.MySlidingTabLayout;
@@ -161,7 +162,7 @@ public class ListNewsActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            ListNewsFragment fragment = ListNewsFragment.newInstance(categoryList.get(position).getId(), categoryList.get(position).getStyleColor());
+            ListNewsFragment fragment = ListNewsFragment.newInstance(Configs.CATEGORY_TYPE, categoryList.get(position).getId(), categoryList.get(position).getStyleColor());
             if (hidingScrollListener != null) {
                 fragment.setHidingScrollListener(hidingScrollListener);
             }
