@@ -162,7 +162,8 @@ public class ListNewsActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            ListNewsFragment fragment = ListNewsFragment.newInstance(Configs.CATEGORY_TYPE, categoryList.get(position).getId(), categoryList.get(position).getStyleColor());
+            ListNewsFragment fragment = ListNewsFragment.newInstance(Configs.CATEGORY_TYPE,
+                    categoryList.get(position).getId(), categoryList.get(position).getStyleColor());
             if (hidingScrollListener != null) {
                 fragment.setHidingScrollListener(hidingScrollListener);
             }

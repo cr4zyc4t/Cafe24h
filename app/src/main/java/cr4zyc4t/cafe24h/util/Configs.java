@@ -25,9 +25,9 @@ public class Configs {
             case CATEGORY_TYPE:
                 return GET_CONTENT_BY_CATEGORY_URL + "?category_id=" + target_id + "&limit=" + limit + "&offset=" + offset;
             case SUBCATEGORY_TYPE:
-                return GET_CONTENT_BY_SUBCATEGORY_URL + "?subcategory_id=" + target_id + "&limit=" + limit + "&offset" + offset;
+                return GET_CONTENT_BY_SUBCATEGORY_URL + "?subcategory_id=" + target_id + "&limit=" + limit + "&offset=" + offset;
             case SOURCE_TYPE:
-                return GET_CONTENT_BY_SOURCE_URL + "?source_id=" + target_id + "&limit=" + limit + "&offset" + offset;
+                return GET_CONTENT_BY_SOURCE_URL + "?source_id=" + target_id + "&limit=" + limit + "&offset=" + offset;
         }
         return null;
     }

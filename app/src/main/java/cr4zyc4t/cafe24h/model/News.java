@@ -7,15 +7,16 @@ import java.io.Serializable;
  */
 public class News implements Serializable {
     private String title, icon, time, description, source_icon;
-    private int id;
+    private int id, source_id;
 
-    public News(String title, String icon, String source_icon, String time, String description, int id) {
+    public News(String title, String icon, String source_icon, String time, String description, int id, int source_id) {
         this.title = title;
         this.icon = icon;
         this.source_icon = source_icon;
         this.time = time;
         this.description = description;
         this.id = id;
+        this.source_id = source_id;
     }
 
     public String getTitle() {
@@ -60,5 +61,13 @@ public class News implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getSource_id() {
+        return source_id;
+    }
+
+    public void setSource_id(int source_id) {
+        this.source_id = source_id;
     }
 }

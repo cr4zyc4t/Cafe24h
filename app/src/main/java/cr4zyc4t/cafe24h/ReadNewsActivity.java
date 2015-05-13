@@ -1,5 +1,6 @@
 package cr4zyc4t.cafe24h;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
     private View placeholder;
     private int placeholder_top;
     private News news;
+    private int own_color;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +55,13 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
         news = (News) getIntent().getSerializableExtra("news");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+
+        own_color = getIntent().getIntExtra("color", getResources().getColor(R.color.primary));
         if (toolbar != null) {
             setSupportActionBar(toolbar);
 
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-            int style_color = getIntent().getIntExtra("color", getResources().getColor(R.color.primary));
-            Utils.setStyleColor(style_color, this);
+            Utils.setStyleColor(own_color, this);
         }
 
         stickyHeader = (LinearLayout) findViewById(R.id.sticky_header);
@@ -229,5 +231,15 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
         title.setText(news.getTitle());
         time.setText(Utils.calcTime(news.getTime()));
         description.setText(news.getDescription());
+
+        source_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent filter = new Intent(ReadNewsActivity.this, SourceFilterActivity.class);
+                filter.putExtra("color", own_color);
+                filter.putExtra("source_id", news.getSource_id());
+                startActivity(filter);
+            }
+        });
     }
 }
