@@ -62,6 +62,8 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
 
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             Utils.setStyleColor(own_color, this);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(Utils.tintColor(own_color));
         }
 
         stickyHeader = (LinearLayout) findViewById(R.id.sticky_header);
@@ -126,13 +128,17 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
 
             if (placeholder_top < scrollY) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    stickyHeader.setElevation(getResources().getDimension(R.dimen.news_header_elevation));
+                    if (stickyHeader.getElevation() == 0) {
+                        stickyHeader.setElevation(getResources().getDimension(R.dimen.news_header_elevation));
+                    }
                 } else {
                     stickyHeader.setBackgroundResource(R.color.news_header_background_highlight);
                 }
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    stickyHeader.setElevation(0);
+                    if (stickyHeader.getElevation() != 0) {
+                        stickyHeader.setElevation(0);
+                    }
                 } else {
                     stickyHeader.setBackgroundResource(android.R.color.white);
                 }
@@ -238,7 +244,9 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
                 Intent filter = new Intent(ReadNewsActivity.this, SourceFilterActivity.class);
                 filter.putExtra("color", own_color);
                 filter.putExtra("source_id", news.getSource_id());
+                filter.putExtra("source", news.getSource());
                 startActivity(filter);
+                finish();
             }
         });
     }

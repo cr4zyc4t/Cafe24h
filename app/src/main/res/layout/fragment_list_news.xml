@@ -15,7 +15,7 @@
         android:layout_alignParentTop="true"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingTop="107dp"
+        android:paddingTop="@dimen/card_vertical_margin"
         android:background="@color/listNewsBackground"
         android:clickable="true"
         android:focusable="true"

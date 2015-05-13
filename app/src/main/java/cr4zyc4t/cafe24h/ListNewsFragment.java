@@ -153,18 +153,21 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         adapter.setCurrent_column(current_column);
         newsContainer.setAdapter(adapter);
 
-        int headerHeight = Utils.getToolbarHeight(view.getContext()) + Utils.getTabBarHeight(view.getContext()) + view.getContext().getResources().getDimensionPixelSize(R.dimen.card_vertical_margin);
-        newsContainer.setPadding(newsContainer.getPaddingLeft(), headerHeight, newsContainer.getPaddingRight(), newsContainer.getPaddingBottom());
-
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setColorSchemeColors(own_color);
-        swipeRefreshLayout.setProgressViewOffset(false, Utils.getToolbarHeight(view.getContext()), 2 * Utils.getToolbarHeight(view.getContext()));
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 refreshNews();
             }
         });
+        if (type_request == Configs.CATEGORY_TYPE){
+            int headerHeight = Utils.getToolbarHeight(view.getContext()) + Utils.getTabBarHeight(view.getContext()) + view.getContext().getResources().getDimensionPixelSize(R.dimen.card_vertical_margin);
+            newsContainer.setPadding(newsContainer.getPaddingLeft(), headerHeight, newsContainer.getPaddingRight(), newsContainer.getPaddingBottom());
+
+            swipeRefreshLayout.setProgressViewOffset(false, Utils.getToolbarHeight(view.getContext()), 2 * Utils.getToolbarHeight(view.getContext()));
+        }
 
         getNews();
     }
@@ -250,7 +253,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
                 for (int i = 0; i < feeds.length(); i++) {
                     JSONObject feed = feeds.optJSONObject(i);
                     if (feed != null) {
-                        News news = new News(feed.optString("title"), feed.optString("icon"), feed.optString("source_icon"), feed.optString("time"), feed.optString("description"), feed.optInt("id"), feed.optInt("source_id"));
+                        News news = new News(feed.optString("title"), feed.optString("icon"), feed.optString("source_icon"), feed.optString("time"), feed.optString("description"), feed.optInt("id"), feed.optInt("source_id"), feed.optString("source"));
                         listNews.add(news);
                         current_offset++;
                         isLoaded = true;
