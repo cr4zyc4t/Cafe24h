@@ -6,13 +6,16 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
@@ -24,6 +27,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import cr4zyc4t.cafe24h.adapter.CacheFragmentStatePagerAdapter;
 import cr4zyc4t.cafe24h.model.Category;
 import cr4zyc4t.cafe24h.util.Configs;
 import cr4zyc4t.cafe24h.util.Utils;
@@ -40,6 +44,8 @@ public class ListNewsActivity extends AppCompatActivity {
     private int mToolbarHeight;
     private HidingScrollListener hidingScrollListener;
     private Toolbar toolbar;
+    private CategoryPagerAdapter pagerAdapter;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +69,8 @@ public class ListNewsActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        CategoryPagerAdapter pagerAdapter = new CategoryPagerAdapter(getSupportFragmentManager());
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        pagerAdapter = new CategoryPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
 
         tabBar = (MySlidingTabLayout) findViewById(R.id.sliding_tabs);
@@ -87,15 +93,15 @@ public class ListNewsActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int i) {
-
+                Log.i("Pager", "Page " + i + " selected");
+                fixTop();
             }
 
             @Override
             public void onPageScrollStateChanged(int i) {
+                Log.i("Pager", "scrolling");
             }
         });
-
-
 
         mToolbarContainer = (LinearLayout) findViewById(R.id.toolbar_container);
         //Add hiding listener
@@ -154,14 +160,14 @@ public class ListNewsActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
-    public class CategoryPagerAdapter extends FragmentPagerAdapter {
+    public class CategoryPagerAdapter extends CacheFragmentStatePagerAdapter {
 
         public CategoryPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
-        public Fragment getItem(int position) {
+        protected Fragment createItem(int position) {
             ListNewsFragment fragment = ListNewsFragment.newInstance(Configs.CATEGORY_TYPE,
                     categoryList.get(position).getId(), categoryList.get(position).getStyleColor());
             if (hidingScrollListener != null) {
@@ -213,5 +219,41 @@ public class ListNewsActivity extends AppCompatActivity {
 
     private void hideActionBar() {
         mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
+    }
+
+    private void fixTop() {
+        if (ActionbarIsHidden()) {
+            for (int i = 0; i < pagerAdapter.getCount(); i++) {
+//                if (i == viewPager.getCurrentItem()) {
+//                    continue;
+//                }
+                Fragment fragment = pagerAdapter.getItemAt(i);
+                if (fragment == null) {
+                    continue;
+                }
+                View fragmentView = fragment.getView();
+                if (fragmentView == null) {
+                    continue;
+                }
+
+                RecyclerView list = (RecyclerView) fragmentView.findViewById(R.id.list_news_container);
+                Log.i("Pager", "page " + i + " list offset " + list.computeVerticalScrollOffset() + ", toolbar " + mToolbarHeight);
+                if (list.computeVerticalScrollOffset() < mToolbarHeight) {
+//                    list.scrollBy(0, mToolbarHeight);
+
+                    LinearLayoutManager layoutManager = (LinearLayoutManager) list.getLayoutManager();
+//                    layoutManager.scrollToPositionWithOffset(1, list.getChildAt(0).getHeight() - mToolbarHeight);
+                    layoutManager.scrollToPositionWithOffset(0, -mToolbarHeight);
+                }
+            }
+        }
+    }
+
+    private boolean ActionbarIsShown() {
+        return mToolbarContainer.getTranslationY() == 0;
+    }
+
+    private boolean ActionbarIsHidden() {
+        return mToolbarContainer.getTranslationY() == -mToolbarHeight;
     }
 }

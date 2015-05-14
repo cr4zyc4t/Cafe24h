@@ -124,7 +124,16 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         } else {
             newsContainer.setLayoutManager(new LinearLayoutManager(view.getContext()));
         }
-
+//        newsContainer.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+//                    newsContainer.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+//                } else {
+//                    newsContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//                }
+//            }
+//        });
 
         newsContainer.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -162,7 +171,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
                 refreshNews();
             }
         });
-        if (type_request == Configs.CATEGORY_TYPE){
+        if (type_request == Configs.CATEGORY_TYPE) {
             int headerHeight = Utils.getToolbarHeight(view.getContext()) + Utils.getTabBarHeight(view.getContext()) + view.getContext().getResources().getDimensionPixelSize(R.dimen.card_vertical_margin);
             newsContainer.setPadding(newsContainer.getPaddingLeft(), headerHeight, newsContainer.getPaddingRight(), newsContainer.getPaddingBottom());
 
