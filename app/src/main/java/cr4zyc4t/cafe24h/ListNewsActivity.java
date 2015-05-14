@@ -72,6 +72,7 @@ public class ListNewsActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         pagerAdapter = new CategoryPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setPadding(viewPager.getPaddingLeft(), Utils.getTabBarHeight(this), viewPager.getPaddingRight(), viewPager.getPaddingBottom());
 
         tabBar = (MySlidingTabLayout) findViewById(R.id.sliding_tabs);
         tabBar.setViewPager(viewPager);

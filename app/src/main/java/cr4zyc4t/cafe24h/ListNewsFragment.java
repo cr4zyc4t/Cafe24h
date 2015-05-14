@@ -172,7 +172,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
             }
         });
         if (type_request == Configs.CATEGORY_TYPE) {
-            int headerHeight = Utils.getToolbarHeight(view.getContext()) + Utils.getTabBarHeight(view.getContext()) + view.getContext().getResources().getDimensionPixelSize(R.dimen.card_vertical_margin);
+            int headerHeight = Utils.getToolbarHeight(view.getContext()) + view.getContext().getResources().getDimensionPixelSize(R.dimen.card_vertical_margin);
             newsContainer.setPadding(newsContainer.getPaddingLeft(), headerHeight, newsContainer.getPaddingRight(), newsContainer.getPaddingBottom());
 
             swipeRefreshLayout.setProgressViewOffset(false, Utils.getToolbarHeight(view.getContext()), 2 * Utils.getToolbarHeight(view.getContext()));
