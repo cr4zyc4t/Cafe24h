@@ -20,5 +20,6 @@
         android:clickable="true"
         android:focusable="true"
         android:scrollbars="none"
-        android:clipToPadding="false" />
+        android:clipToPadding="false"
+        android:overScrollMode="never" />
 </android.support.v4.widget.SwipeRefreshLayout>

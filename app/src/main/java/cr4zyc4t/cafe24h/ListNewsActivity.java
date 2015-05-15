@@ -235,10 +235,13 @@ public class ListNewsActivity extends AppCompatActivity {
     private void fixTop() {
         if (ActionbarIsHidden()) {
             for (int i = 0; i < pagerAdapter.getCount(); i++) {
+                ListNewsFragment fragment = (ListNewsFragment) pagerAdapter.getItemAt(i);
 //                if (i == viewPager.getCurrentItem()) {
-//                    continue;
+//                    fragment.setHidingScrollListener(hidingScrollListener);
+//                }else{
+//                    fragment.setHidingScrollListener(null);
 //                }
-                Fragment fragment = pagerAdapter.getItemAt(i);
+
                 if (fragment == null) {
                     continue;
                 }
