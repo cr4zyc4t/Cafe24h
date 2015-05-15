@@ -2,6 +2,7 @@ package cr4zyc4t.cafe24h.widget;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import cr4zyc4t.cafe24h.util.Utils;
 
@@ -11,8 +12,8 @@ import cr4zyc4t.cafe24h.util.Utils;
 * */
 public abstract class HidingScrollListener extends RecyclerView.OnScrollListener {
 
-    private static final float HIDE_THRESHOLD = 10;
-    private static final float SHOW_THRESHOLD = 70;
+    private static float HIDE_THRESHOLD = 10;
+    private static float SHOW_THRESHOLD = 70;
 
     private int mToolbarOffset = 0;
     private boolean mControlsVisible = true;
@@ -21,6 +22,9 @@ public abstract class HidingScrollListener extends RecyclerView.OnScrollListener
 
     public HidingScrollListener(Context context) {
         mToolbarHeight = Utils.getToolbarHeight(context);
+
+        HIDE_THRESHOLD = 0.15f * mToolbarHeight;
+        SHOW_THRESHOLD = 0.85f * mToolbarHeight;
     }
 
     @Override
@@ -53,7 +57,6 @@ public abstract class HidingScrollListener extends RecyclerView.OnScrollListener
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
 
-
         clipToolbarOffset();
 
         onMoved(mToolbarOffset);
@@ -84,6 +87,7 @@ public abstract class HidingScrollListener extends RecyclerView.OnScrollListener
     }
 
     private void setInvisible() {
+        Log.i("ActionBar", "Offset " + mToolbarOffset + ", height " + mToolbarHeight);
         if (mToolbarOffset < mToolbarHeight) {
             onHide();
             mToolbarOffset = mToolbarHeight;

@@ -124,6 +124,7 @@ public class ListNewsActivity extends AppCompatActivity {
 
             @Override
             public void onHide() {
+                Log.i("ActionBar", "Onhide");
                 hideActionBar();
             }
         };
