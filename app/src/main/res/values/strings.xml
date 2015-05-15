@@ -6,4 +6,5 @@
     <string name="retry_button">Retry</string>
     <string name="title_activity_source_filter">SourceFilterActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 </resources>

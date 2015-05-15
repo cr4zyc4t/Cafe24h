@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Display Settings">
+
+        <CheckBoxPreference
+            android:key="actionbar_hide"
+            android:title="Actionbar Hide On Scroll"
+            android:summary="restart application required"
+            android:defaultValue="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

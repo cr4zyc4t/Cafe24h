@@ -63,7 +63,7 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             Utils.setStyleColor(own_color, this);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(Utils.tintColor(own_color));
+            getWindow().setStatusBarColor(Utils.tintColor(own_color, this));
         }
 
         stickyHeader = (LinearLayout) findViewById(R.id.sticky_header);

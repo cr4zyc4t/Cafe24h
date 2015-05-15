@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Display Settings">
+
+        <ListPreference
+            android:defaultValue="tint"
+            android:dialogTitle="StatusBar Style"
+            android:entries="@array/statusbar_mode_title"
+            android:entryValues="@array/statusbar_mode_value"
+            android:key="statusbar_pref"
+            android:summary=""
+            android:title="Statusbar Style" />
+
+        <CheckBoxPreference
+            android:key="actionbar_hide"
+            android:title="Actionbar Hide On Scroll"
+            android:summary="restart application required"
+            android:defaultValue="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

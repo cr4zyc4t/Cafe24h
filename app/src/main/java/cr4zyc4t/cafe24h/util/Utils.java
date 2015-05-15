@@ -2,6 +2,7 @@ package cr4zyc4t.cafe24h.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -21,6 +22,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
 import android.view.Display;
@@ -310,7 +312,12 @@ public class Utils {
         }
     }
 
-    public static int tintColor(int color) {
+    public static int tintColor(int color, Activity activity) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        if (sharedPreferences.getString("statusbar_pref", "tint").equals("sync")) {
+            return color;
+        }
+
         float ratio = 0.85f;
         float r = Color.red(color) * ratio;
         float g = Color.green(color) * ratio;
@@ -377,7 +384,7 @@ public class Utils {
 
     public static void setStyleColor(int c, AppCompatActivity activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            activity.getWindow().setStatusBarColor(Utils.tintColor(c));
+            activity.getWindow().setStatusBarColor(Utils.tintColor(c, activity));
         }
         activity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(c));
     }

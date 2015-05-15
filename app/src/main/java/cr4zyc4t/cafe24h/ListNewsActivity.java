@@ -2,8 +2,11 @@
 
 package cr4zyc4t.cafe24h;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -46,6 +49,8 @@ public class ListNewsActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private CategoryPagerAdapter pagerAdapter;
     private ViewPager viewPager;
+    private SharedPreferences sharedPreferences;
+    private boolean isAutoHideActionbar = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +100,7 @@ public class ListNewsActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int i) {
                 Log.i("Pager", "Page " + i + " selected");
-                fixTop();
+//                fixTop();
             }
 
             @Override
@@ -124,6 +129,9 @@ public class ListNewsActivity extends AppCompatActivity {
         };
 
         setStyleColor(categoryList.get(0).getStyleColor());
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        isAutoHideActionbar = sharedPreferences.getBoolean("actionbar_hide", false);
     }
 
     @Override
@@ -142,6 +150,7 @@ public class ListNewsActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(ListNewsActivity.this, SettingsActivity.class));
             return true;
         }
 
@@ -171,7 +180,7 @@ public class ListNewsActivity extends AppCompatActivity {
         protected Fragment createItem(int position) {
             ListNewsFragment fragment = ListNewsFragment.newInstance(Configs.CATEGORY_TYPE,
                     categoryList.get(position).getId(), categoryList.get(position).getStyleColor());
-            if (hidingScrollListener != null) {
+            if ((hidingScrollListener != null) && isAutoHideActionbar) {
                 fragment.setHidingScrollListener(hidingScrollListener);
             }
             return fragment;
