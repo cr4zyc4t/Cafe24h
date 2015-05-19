@@ -19,8 +19,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 
 import org.json.JSONArray;
@@ -100,7 +98,7 @@ public class ListNewsActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int i) {
                 Log.i("Pager", "Page " + i + " selected");
-//                fixTop();
+                fixTop();
             }
 
             @Override
@@ -114,6 +112,7 @@ public class ListNewsActivity extends AppCompatActivity {
         hidingScrollListener = new HidingScrollListener(this) {
             @Override
             public void onMoved(int distance) {
+                mToolbarContainer.animate().cancel();
                 mToolbarContainer.setTranslationY(-distance);
             }
 
@@ -225,11 +224,13 @@ public class ListNewsActivity extends AppCompatActivity {
     }
 
     private void showActionBar() {
-        mToolbarContainer.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+        mToolbarContainer.animate().cancel();
+        mToolbarContainer.animate().translationY(0).setDuration(200).start();
     }
 
     private void hideActionBar() {
-        mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
+        mToolbarContainer.animate().cancel();
+        mToolbarContainer.animate().translationY(-mToolbarHeight).setDuration(200).start();
     }
 
     private void fixTop() {
