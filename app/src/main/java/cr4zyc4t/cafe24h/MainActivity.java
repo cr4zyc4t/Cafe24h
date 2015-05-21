@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -73,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... params) {
             String url = Configs.GET_CATEGORY_URL;
-            Log.i("Resquest", url);
             try {
                 return Utils.StringRequest(url);
             } catch (IOException e) {

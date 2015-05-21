@@ -8,7 +8,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -123,7 +122,6 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
     public void onScrollChanged(int scrollY) {
         if (placeholder != null) {   // Only in tablet mode
             placeholder_top = placeholder.getTop();
-            Log.i("Run", "placeholder top :" + placeholder_top + ", scrollY: " + scrollY);
             stickyHeader.setTranslationY(Math.max(placeholder_top, scrollY));
 
             if (placeholder_top < scrollY) {
@@ -171,7 +169,6 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
         @Override
         protected String doInBackground(Integer... params) {
             String url = FETCH_NEWS_URL + "?content_id=" + params[0];
-            Log.d("Link", url);
             try {
                 return Utils.StringRequest(url);
             } catch (IOException e) {

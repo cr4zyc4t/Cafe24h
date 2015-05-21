@@ -13,6 +13,7 @@ public class SourceFilterActivity extends AppCompatActivity {
     private String source;
     private int source_id;
     private int own_color;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,7 +28,7 @@ public class SourceFilterActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(source);
 
-        if((savedInstanceState == null) && (source_id != 0)){
+        if ((savedInstanceState == null) && (source_id != 0)) {
             ListNewsFragment listNewsFragment = ListNewsFragment.newInstance(Configs.SOURCE_TYPE, source_id, own_color);
 
             getSupportFragmentManager().beginTransaction().add(R.id.source_filter_fragment, listNewsFragment).commit();

@@ -12,7 +12,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +28,6 @@ import cr4zyc4t.cafe24h.adapter.ListNews_Adapter;
 import cr4zyc4t.cafe24h.model.News;
 import cr4zyc4t.cafe24h.util.Configs;
 import cr4zyc4t.cafe24h.util.Utils;
-import cr4zyc4t.cafe24h.widget.HidingScrollListener;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,10 +39,12 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
     private static final String TYPE = "type_request";
     private static final String TARGET_ID = "target_id";
     private static final String COLOR = "color";
+    private static final String INITIAL_POS = "initial_position";
 
     private int type_request;
     private int target_id;
     private int own_color;
+    private int initial_position;
 
     private final int GRID_COLUMN = 2;
     private List<News> listNews = new ArrayList<>();
@@ -58,21 +57,33 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
 
     private int current_offset = 0;
     private int current_column = 1;
-    private HidingScrollListener hidingScrollListener;
+
+    private ContentScrollListenter contentScrollListenter;
+    private LinearLayoutManager layoutManager;
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Category_id.
      * @return A new instance of fragment ListNewsFragment.
      */
-    public static ListNewsFragment newInstance(int param1, int param2, int param3) {
+    public static ListNewsFragment newInstance(int type_request, int target_id, int own_color) {
         ListNewsFragment fragment = new ListNewsFragment();
         Bundle args = new Bundle();
-        args.putInt(TYPE, param1);
-        args.putInt(TARGET_ID, param2);
-        args.putInt(COLOR, param3);
+        args.putInt(TYPE, type_request);
+        args.putInt(TARGET_ID, target_id);
+        args.putInt(COLOR, own_color);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static ListNewsFragment newInstance(int type_request, int target_id, int own_color, int initial_position) {
+        ListNewsFragment fragment = new ListNewsFragment();
+        Bundle args = new Bundle();
+        args.putInt(TYPE, type_request);
+        args.putInt(TARGET_ID, target_id);
+        args.putInt(COLOR, own_color);
+        args.putInt(INITIAL_POS, initial_position);
         fragment.setArguments(args);
         return fragment;
     }
@@ -81,8 +92,8 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         // Required empty public constructor
     }
 
-    public void setHidingScrollListener(HidingScrollListener hidingScrollListener) {
-        this.hidingScrollListener = hidingScrollListener;
+    public void setContentScrollListenter(ContentScrollListenter contentScrollListenter) {
+        this.contentScrollListenter = contentScrollListenter;
     }
 
     @Override
@@ -92,13 +103,12 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
             type_request = getArguments().getInt(TYPE);
             target_id = getArguments().getInt(TARGET_ID);
             own_color = getArguments().getInt(COLOR);
+            initial_position = getArguments().getInt(INITIAL_POS);
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_list_news, container, false);
     }
 
@@ -121,24 +131,18 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
             });
             newsContainer.setLayoutManager(gridLayoutManager);
             current_column = GRID_COLUMN;
+            layoutManager = (LinearLayoutManager) gridLayoutManager;
         } else {
-            newsContainer.setLayoutManager(new LinearLayoutManager(view.getContext()));
+            layoutManager = new LinearLayoutManager(view.getContext());
+            newsContainer.setLayoutManager(layoutManager);
         }
-//        newsContainer.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//            @Override
-//            public void onGlobalLayout() {
-//                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-//                    newsContainer.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-//                } else {
-//                    newsContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//                }
-//            }
-//        });
 
         newsContainer.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+
+                if (contentScrollListenter != null) contentScrollListenter.onContentScroll(dy);
 
                 LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
                 visibleItemCount = layoutManager.getChildCount();
@@ -152,10 +156,14 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
                     }
                 }
             }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (contentScrollListenter != null)
+                    contentScrollListenter.onContentScrollStateChange(newState);
+            }
         });
-        if (hidingScrollListener != null) {
-            newsContainer.addOnScrollListener(hidingScrollListener);
-        }
 
         adapter = new ListNews_Adapter(listNews, getActivity());
         adapter.setNewsClickListener(this);
@@ -164,13 +172,13 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setColorSchemeColors(own_color);
-
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 refreshNews();
             }
         });
+
         if (type_request == Configs.CATEGORY_TYPE) {
             int headerHeight = Utils.getToolbarHeight(view.getContext()) + view.getContext().getResources().getDimensionPixelSize(R.dimen.card_vertical_margin);
             newsContainer.setPadding(newsContainer.getPaddingLeft(), headerHeight, newsContainer.getPaddingRight(), newsContainer.getPaddingBottom());
@@ -184,7 +192,6 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
     @Override
     public void NewsClicked(int position) {
         News clicked_item = listNews.get(position);
-        Log.i("Action", " Click " + clicked_item.getTitle());
 
         Intent readnews = new Intent(getActivity(), ReadNewsActivity.class);
         readnews.putExtra("news", clicked_item);
@@ -222,13 +229,14 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
             if (!swipeRefreshLayout.isRefreshing()) {
                 listNews.add(null);
                 adapter.notifyItemInserted(listNews.size() - 1);
+
+                swipeRefreshLayout.setEnabled(false);
             }
         }
 
         @Override
         protected String doInBackground(Void... params) {
             String url = Configs.getContentURL(type_request, target_id, Configs.NEWS_PER_LOAD, current_offset);
-            Log.i("Request", url);
             try {
                 return Utils.StringRequest(url);
             } catch (IOException e) {
@@ -240,6 +248,10 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+
+            if (!swipeRefreshLayout.isEnabled()) {
+                swipeRefreshLayout.setEnabled(true);
+            }
 
             JSONArray feeds = null;
             if (s != null) {
@@ -266,10 +278,24 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
                         listNews.add(news);
                         current_offset++;
                         isLoaded = true;
-                        adapter.notifyItemInserted(listNews.size() - 1);
+                        if (listNews.size() > Configs.NEWS_PER_LOAD) {
+                            adapter.notifyItemInserted(listNews.size() - 1);
+                        }
+                    }
+                }
+                if (listNews.size() <= Configs.NEWS_PER_LOAD) {
+                    adapter.notifyDataSetChanged();
+                    if (initial_position > 0) {
+                        layoutManager.scrollToPositionWithOffset(0, -initial_position);
                     }
                 }
             }
         }
+    }
+
+    public interface ContentScrollListenter {
+        void onContentScroll(int dy);
+
+        void onContentScrollStateChange(int state);
     }
 }

@@ -15,10 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 
 import org.json.JSONArray;
@@ -32,23 +33,23 @@ import cr4zyc4t.cafe24h.adapter.CacheFragmentStatePagerAdapter;
 import cr4zyc4t.cafe24h.model.Category;
 import cr4zyc4t.cafe24h.util.Configs;
 import cr4zyc4t.cafe24h.util.Utils;
-import cr4zyc4t.cafe24h.widget.HidingScrollListener;
 import cr4zyc4t.cafe24h.widget.MySlidingTabLayout;
 
 
-public class ListNewsActivity extends AppCompatActivity {
+public class ListNewsActivity extends AppCompatActivity implements ListNewsFragment.ContentScrollListenter {
     private MySlidingTabLayout tabBar;
     private List<Integer> colors = new ArrayList<>();
     private List<Category> categoryList = new ArrayList<>();
 
     private LinearLayout mToolbarContainer;
-    private int mToolbarHeight;
-    private HidingScrollListener hidingScrollListener;
     private Toolbar toolbar;
     private CategoryPagerAdapter pagerAdapter;
     private ViewPager viewPager;
     private SharedPreferences sharedPreferences;
-    private boolean isAutoHideActionbar = false;
+
+    private int mToolbarHeight;
+    private float scrollDistance = 0;
+    private int headerOffset = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,41 +98,57 @@ public class ListNewsActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int i) {
-                Log.i("Pager", "Page " + i + " selected");
-                fixTop();
+                fixTopPadding();
             }
 
             @Override
             public void onPageScrollStateChanged(int i) {
-                Log.i("Pager", "scrolling");
             }
         });
 
         mToolbarContainer = (LinearLayout) findViewById(R.id.toolbar_container);
-        //Add hiding listener
-        hidingScrollListener = new HidingScrollListener(this) {
-            @Override
-            public void onMoved(int distance) {
-                mToolbarContainer.animate().cancel();
-                mToolbarContainer.setTranslationY(-distance);
-            }
-
-            @Override
-            public void onShow() {
-                showActionBar();
-            }
-
-            @Override
-            public void onHide() {
-                Log.i("ActionBar", "Onhide");
-                hideActionBar();
-            }
-        };
 
         setStyleColor(categoryList.get(0).getStyleColor());
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        isAutoHideActionbar = sharedPreferences.getBoolean("actionbar_hide", false);
+    }
+
+    private void fixTopPadding() {
+        scrollDistance = ActionbarIsShown() ? 0 : mToolbarHeight;
+        pagerAdapter.setScrollY((int) scrollDistance);
+
+        // Set scrollY for the active fragments
+        for (int i = 0; i < pagerAdapter.getCount(); i++) {
+            // Skip current item
+//            if (i == mPager.getCurrentItem()) {
+//                continue;
+//            }
+
+            // Skip destroyed or not created item
+            Fragment f = pagerAdapter.getItemAt(i);
+            if (f == null) {
+                continue;
+            }
+
+            View view = f.getView();
+            if (view == null) {
+                continue;
+            }
+
+            RecyclerView scrollContent = (RecyclerView) view.findViewById(R.id.list_news_container);
+            if (scrollContent == null) {
+                continue;
+            }
+
+            LinearLayoutManager layoutManager = (LinearLayoutManager) scrollContent.getLayoutManager();
+            if (headerOffset > 0) {
+                if (scrollContent.computeVerticalScrollOffset() == 0)
+                    layoutManager.scrollToPositionWithOffset(0, -mToolbarHeight);
+            } else {
+                if (scrollContent.computeVerticalScrollOffset() <= mToolbarHeight)
+                    layoutManager.scrollToPositionWithOffset(0, 0);
+            }
+        }
     }
 
     @Override
@@ -170,19 +187,57 @@ public class ListNewsActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+    @Override
+    public void onContentScroll(int dy) {
+        headerOffset += dy;
+        if (headerOffset < 0) headerOffset = 0;
+        if (headerOffset > mToolbarHeight) headerOffset = mToolbarHeight;
+        mToolbarContainer.setTranslationY(-headerOffset);
+
+        if (scrollDistance < 0) {
+            scrollDistance = 0;
+        } else {
+            scrollDistance += dy;
+        }
+    }
+
+    @Override
+    public void onContentScrollStateChange(int state) {
+        if (state == RecyclerView.SCROLL_STATE_IDLE) {
+            if (scrollDistance < mToolbarHeight) {
+                showActionBar();
+            } else {
+                if (headerOffset > 0.7f * mToolbarHeight) {
+                    hideActionBar();
+                } else {
+                    showActionBar();
+                }
+            }
+        }
+    }
+
     public class CategoryPagerAdapter extends CacheFragmentStatePagerAdapter {
+        private int mScrollY;
 
         public CategoryPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
+        public void setScrollY(int mScrollY) {
+            this.mScrollY = mScrollY;
+        }
+
         @Override
         protected Fragment createItem(int position) {
-            ListNewsFragment fragment = ListNewsFragment.newInstance(Configs.CATEGORY_TYPE,
-                    categoryList.get(position).getId(), categoryList.get(position).getStyleColor());
-            if ((hidingScrollListener != null) && isAutoHideActionbar) {
-                fragment.setHidingScrollListener(hidingScrollListener);
+            ListNewsFragment fragment;
+            if (mScrollY > 0) {
+                fragment = ListNewsFragment.newInstance(Configs.CATEGORY_TYPE,
+                        categoryList.get(position).getId(), categoryList.get(position).getStyleColor(), mScrollY);
+            } else {
+                fragment = ListNewsFragment.newInstance(Configs.CATEGORY_TYPE,
+                        categoryList.get(position).getId(), categoryList.get(position).getStyleColor());
             }
+            fragment.setContentScrollListenter(ListNewsActivity.this);
             return fragment;
         }
 
@@ -224,44 +279,15 @@ public class ListNewsActivity extends AppCompatActivity {
     }
 
     private void showActionBar() {
+        headerOffset = 0;
         mToolbarContainer.animate().cancel();
-        mToolbarContainer.animate().translationY(0).setDuration(200).start();
+        mToolbarContainer.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
     }
 
     private void hideActionBar() {
+        headerOffset = mToolbarHeight;
         mToolbarContainer.animate().cancel();
-        mToolbarContainer.animate().translationY(-mToolbarHeight).setDuration(200).start();
-    }
-
-    private void fixTop() {
-        if (ActionbarIsHidden()) {
-            for (int i = 0; i < pagerAdapter.getCount(); i++) {
-                ListNewsFragment fragment = (ListNewsFragment) pagerAdapter.getItemAt(i);
-//                if (i == viewPager.getCurrentItem()) {
-//                    fragment.setHidingScrollListener(hidingScrollListener);
-//                }else{
-//                    fragment.setHidingScrollListener(null);
-//                }
-
-                if (fragment == null) {
-                    continue;
-                }
-                View fragmentView = fragment.getView();
-                if (fragmentView == null) {
-                    continue;
-                }
-
-                RecyclerView list = (RecyclerView) fragmentView.findViewById(R.id.list_news_container);
-                Log.i("Pager", "page " + i + " list offset " + list.computeVerticalScrollOffset() + ", toolbar " + mToolbarHeight);
-                if (list.computeVerticalScrollOffset() < mToolbarHeight) {
-//                    list.scrollBy(0, mToolbarHeight);
-
-                    LinearLayoutManager layoutManager = (LinearLayoutManager) list.getLayoutManager();
-//                    layoutManager.scrollToPositionWithOffset(1, list.getChildAt(0).getHeight() - mToolbarHeight);
-                    layoutManager.scrollToPositionWithOffset(0, -mToolbarHeight);
-                }
-            }
-        }
+        mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
     }
 
     private boolean ActionbarIsShown() {
