@@ -274,7 +274,15 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
                 for (int i = 0; i < feeds.length(); i++) {
                     JSONObject feed = feeds.optJSONObject(i);
                     if (feed != null) {
-                        News news = new News(feed.optString("title"), feed.optString("icon"), feed.optString("source_icon"), feed.optString("time"), feed.optString("description"), feed.optInt("id"), feed.optInt("source_id"), feed.optString("source"));
+                        News news = new News(feed.optString("title"),
+                                feed.optString("icon"),
+                                feed.optString("source_icon"),
+                                feed.optString("time"),
+                                feed.optString("description"),
+                                feed.optInt("id"),
+                                feed.optInt("source_id"),
+                                feed.optString("source"),
+                                feed.optString("subcategory_name"));
                         listNews.add(news);
                         current_offset++;
                         isLoaded = true;

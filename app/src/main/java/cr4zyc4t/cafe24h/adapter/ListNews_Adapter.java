@@ -86,6 +86,7 @@ public class ListNews_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             this_view_holder.title.setText(item.getTitle());
             this_view_holder.description.setText(item.getDescription());
             this_view_holder.timestamp.setText(Utils.calcTime(item.getTime()));
+            this_view_holder.subcategory.setText(item.getSubcategory());
 
             if (URLUtil.isValidUrl(item.getIcon())) {
 //                int icon_width = Utils.getScreenWidth(mContext) - mContext.getResources().getDimensionPixelSize(R.dimen.card_horizontal_margin) - mContext.getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
@@ -120,7 +121,7 @@ public class ListNews_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     public class ItemViewHolder extends RecyclerView.ViewHolder {
         protected ImageView icon, source_icon;
-        protected TextView title, description, timestamp;
+        protected TextView title, description, timestamp, subcategory;
         protected View parent;
 
         public ItemViewHolder(View itemView) {
@@ -131,6 +132,7 @@ public class ListNews_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             this.title = (TextView) itemView.findViewById(R.id.title);
             this.description = (TextView) itemView.findViewById(R.id.description);
             this.timestamp = (TextView) itemView.findViewById(R.id.timestamp);
+            this.subcategory = (TextView) itemView.findViewById(R.id.subcategory);
         }
 
         public View getIcon() {

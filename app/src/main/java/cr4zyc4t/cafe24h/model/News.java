@@ -6,10 +6,10 @@ import java.io.Serializable;
  * Created by Admin on 2015-04-24.
  */
 public class News implements Serializable {
-    private String title, icon, time, description, source_icon, source;
+    private String title, icon, time, description, source_icon, source, subcategory;
     private int id, source_id;
 
-    public News(String title, String icon, String source_icon, String time, String description, int id, int source_id, String source) {
+    public News(String title, String icon, String source_icon, String time, String description, int id, int source_id, String source, String subcategory) {
         this.title = title;
         this.icon = icon;
         this.source_icon = source_icon;
@@ -18,6 +18,7 @@ public class News implements Serializable {
         this.id = id;
         this.source_id = source_id;
         this.source = source;
+        this.subcategory = subcategory;
     }
 
     public String getTitle() {
@@ -74,5 +75,13 @@ public class News implements Serializable {
 
     public String getSource() {
         return source;
+    }
+
+    public String getSubcategory() {
+        return subcategory;
+    }
+
+    public void setSubcategory(String subcategory) {
+        this.subcategory = subcategory;
     }
 }
