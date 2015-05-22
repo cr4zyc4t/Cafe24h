@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -92,7 +93,11 @@ public class ListNews_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 //                int icon_width = Utils.getScreenWidth(mContext) - mContext.getResources().getDimensionPixelSize(R.dimen.card_horizontal_margin) - mContext.getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
                 int icon_width = Utils.getScreenWidth(mContext) - 2 * mContext.getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
                 icon_width = icon_width / current_column;
-                Picasso.with(mContext).load(item.getIcon()).resize(icon_width, icon_width / 2).centerCrop().into(this_view_holder.icon);
+
+                FrameLayout.LayoutParams iconLayoutParams = new FrameLayout.LayoutParams(icon_width, (int) (icon_width * 0.5f));
+                this_view_holder.icon.setLayoutParams(iconLayoutParams);
+
+                Picasso.with(mContext).load(item.getIcon()).resize(icon_width, (int) (icon_width * 0.5f)).centerCrop().placeholder(R.drawable.placeholder).into(this_view_holder.icon);
             } else {
                 this_view_holder.icon.setVisibility(View.GONE);
             }

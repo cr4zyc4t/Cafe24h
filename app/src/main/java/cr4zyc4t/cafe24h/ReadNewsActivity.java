@@ -221,12 +221,11 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
             LinearLayout firstColumn = (LinearLayout) findViewById(R.id.first_column);
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(icon_width, LinearLayout.LayoutParams.MATCH_PARENT);
             firstColumn.setLayoutParams(layoutParams);
-
-            LinearLayout.LayoutParams iconLayoutParams = new LinearLayout.LayoutParams(icon_width, (int) (icon_width * 0.5f));
-            icon.setLayoutParams(iconLayoutParams);
         }
+        LinearLayout.LayoutParams iconLayoutParams = new LinearLayout.LayoutParams(icon_width, (int) (icon_width * 0.5f));
+        icon.setLayoutParams(iconLayoutParams);
 
-        Picasso.with(this).load(news.getIcon()).resize(icon_width, (int) (icon_width * 0.5f)).centerCrop().into(icon);
+        Picasso.with(this).load(news.getIcon()).resize(icon_width, (int) (icon_width * 0.5f)).centerCrop().placeholder(R.drawable.placeholder).into(icon);
         if (URLUtil.isValidUrl(news.getSource_icon())) {
             Picasso.with(this).load(news.getSource_icon()).resize(128, 128).centerCrop().error(R.drawable.cafe24h_icon).into(source_icon);
         }
