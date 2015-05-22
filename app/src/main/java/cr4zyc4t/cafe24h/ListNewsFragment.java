@@ -282,17 +282,14 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
                                 feed.optInt("id"),
                                 feed.optInt("source_id"),
                                 feed.optString("source"),
-                                feed.optString("subcategory_name"));
+                                feed.optString("subcategory"));
                         listNews.add(news);
                         current_offset++;
                         isLoaded = true;
-                        if (listNews.size() > Configs.NEWS_PER_LOAD) {
-                            adapter.notifyItemInserted(listNews.size() - 1);
-                        }
+                        adapter.notifyItemInserted(listNews.size() - 1);
                     }
                 }
                 if (listNews.size() <= Configs.NEWS_PER_LOAD) {
-                    adapter.notifyDataSetChanged();
                     if (initial_position > 0) {
                         layoutManager.scrollToPositionWithOffset(0, -initial_position);
                     }
