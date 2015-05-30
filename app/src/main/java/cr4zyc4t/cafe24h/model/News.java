@@ -7,9 +7,9 @@ import java.io.Serializable;
  */
 public class News implements Serializable {
     private String title, icon, time, description, source_icon, source, subcategory;
-    private int id, source_id;
+    private int id, source_id, subcategory_id;
 
-    public News(String title, String icon, String source_icon, String time, String description, int id, int source_id, String source, String subcategory) {
+    public News(String title, String icon, String source_icon, String time, String description, int id, int source_id, String source, String subcategory, int subcategory_id) {
         this.title = title;
         this.icon = icon;
         this.source_icon = source_icon;
@@ -19,6 +19,7 @@ public class News implements Serializable {
         this.source_id = source_id;
         this.source = source;
         this.subcategory = subcategory;
+        this.subcategory_id = subcategory_id;
     }
 
     public String getTitle() {
@@ -79,6 +80,10 @@ public class News implements Serializable {
 
     public String getSubcategory() {
         return subcategory;
+    }
+
+    public int getSubcategory_id() {
+        return subcategory_id;
     }
 
     public void setSubcategory(String subcategory) {

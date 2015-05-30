@@ -32,6 +32,10 @@
             android:label="@string/title_activity_source_filter"
             android:theme="@style/MaterialTheme" />
         <activity
+            android:name=".SubcategoryFilterActivity"
+            android:label="@string/title_activity_source_filter"
+            android:theme="@style/MaterialTheme" />
+        <activity
             android:theme="@style/MaterialTheme"
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"></activity>

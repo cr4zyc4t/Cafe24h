@@ -12,6 +12,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -211,6 +212,17 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         }
     }
 
+    @Override
+    public void SubcategoryClicked(int position) {
+        News news = listNews.get(position);
+
+        Intent filter = new Intent(getActivity(), SubcategoryFilterActivity.class);
+        filter.putExtra("color", own_color);
+        filter.putExtra("subcategory", news.getSubcategory());
+        filter.putExtra("subcategory_id", news.getSubcategory_id());
+        startActivity(filter);
+    }
+
     public void getNews() {
         new getNewsList().execute();
     }
@@ -237,6 +249,7 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
         @Override
         protected String doInBackground(Void... params) {
             String url = Configs.getContentURL(type_request, target_id, Configs.NEWS_PER_LOAD, current_offset);
+            Log.i("Resquest", "URL " + url);
             try {
                 return Utils.StringRequest(url);
             } catch (IOException e) {
@@ -282,7 +295,9 @@ public class ListNewsFragment extends Fragment implements ListNews_Adapter.NewsC
                                 feed.optInt("id"),
                                 feed.optInt("source_id"),
                                 feed.optString("source"),
-                                feed.optString("subcategory"));
+                                feed.optString("subcategory"),
+                                feed.optInt("subcategory_id")
+                        );
                         listNews.add(news);
                         current_offset++;
                         isLoaded = true;

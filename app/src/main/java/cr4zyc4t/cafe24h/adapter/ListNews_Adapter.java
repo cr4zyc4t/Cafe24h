@@ -80,14 +80,18 @@ public class ListNews_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder view_holder, final int position) {
         if (view_holder instanceof ItemViewHolder) {
-            News item = listNews.get(position);
+            final News item = listNews.get(position);
 
             ItemViewHolder this_view_holder = (ItemViewHolder) view_holder;
 
             this_view_holder.title.setText(item.getTitle());
             this_view_holder.description.setText(item.getDescription());
             this_view_holder.timestamp.setText(Utils.calcTime(item.getTime()));
-            this_view_holder.subcategory.setText(item.getSubcategory());
+            if (item.getSubcategory().length() > 0) {
+                this_view_holder.subcategory.setText(item.getSubcategory());
+            } else {
+                this_view_holder.subcategory.setVisibility(View.GONE);
+            }
 
             if (URLUtil.isValidUrl(item.getIcon())) {
 //                int icon_width = Utils.getScreenWidth(mContext) - mContext.getResources().getDimensionPixelSize(R.dimen.card_horizontal_margin) - mContext.getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
@@ -109,6 +113,15 @@ public class ListNews_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 Picasso.with(mContext).load(R.drawable.cafe24h_icon).into(this_view_holder.source_icon);
             }
 
+            this_view_holder.subcategory.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if ((newsClickListener != null) && (item.getSubcategory().length() > 0)) {
+                        newsClickListener.SubcategoryClicked(position);
+                    }
+                }
+            });
+
             view_holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -122,6 +135,8 @@ public class ListNews_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     public interface NewsClickListener {
         void NewsClicked(int position);
+
+        void SubcategoryClicked(int position);
     }
 
     public class ItemViewHolder extends RecyclerView.ViewHolder {
