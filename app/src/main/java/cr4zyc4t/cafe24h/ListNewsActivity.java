@@ -41,7 +41,7 @@ public class ListNewsActivity extends AppCompatActivity implements ListNewsFragm
     private List<Integer> colors = new ArrayList<>();
     private List<Category> categoryList = new ArrayList<>();
 
-    private LinearLayout mToolbarContainer;
+    private View mToolbarContainer;
     private Toolbar toolbar;
     private CategoryPagerAdapter pagerAdapter;
     private ViewPager viewPager;
@@ -106,11 +106,17 @@ public class ListNewsActivity extends AppCompatActivity implements ListNewsFragm
             }
         });
 
-        mToolbarContainer = (LinearLayout) findViewById(R.id.toolbar_container);
+        mToolbarContainer = findViewById(R.id.toolbar_container);
 
         setStyleColor(categoryList.get(0).getStyleColor());
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        //Fix Shadow
+        View tab_placeholder = findViewById(R.id.sliding_tabs_placeholder);
+        if (tab_placeholder != null) {
+            tab_placeholder.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Utils.getTabBarHeight(this)));
+        }
     }
 
     private void fixTopPadding() {

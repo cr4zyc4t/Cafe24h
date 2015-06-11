@@ -8,6 +8,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -15,11 +16,15 @@ import android.webkit.URLUtil;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -28,6 +33,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import cr4zyc4t.cafe24h.model.News;
+import cr4zyc4t.cafe24h.model.VolleySingleton;
 import cr4zyc4t.cafe24h.util.Utils;
 import cr4zyc4t.cafe24h.widget.ObservableScrollView;
 
@@ -40,11 +46,14 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
     private WebView body;
     private ObservableScrollView scrollView;
     private ImageView icon;
-    private LinearLayout stickyHeader;
+    private View stickyHeader;
+    private View stickyHeaderElevation;
     private View placeholder;
     private int placeholder_top;
     private News news;
     private int own_color;
+
+    private boolean is_header_has_shadow = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +74,9 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
             getWindow().setStatusBarColor(Utils.tintColor(own_color, this));
         }
 
-        stickyHeader = (LinearLayout) findViewById(R.id.sticky_header);
+        stickyHeader = findViewById(R.id.sticky_header_container);
         placeholder = findViewById(R.id.placeholder);
+        stickyHeaderElevation = findViewById(R.id.sticky_header_elevation);
 
         icon = (ImageView) findViewById(R.id.icon);
 
@@ -93,7 +103,8 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
 
         initFirstView();
 
-        new getContentAsync().execute(news.getId());
+//        new getContentAsync().execute(news.getId());
+        getContentDetail(news.getId());
 
         buttonRetry.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,20 +136,24 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
             stickyHeader.setTranslationY(Math.max(placeholder_top, scrollY));
 
             if (placeholder_top < scrollY) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    if (stickyHeader.getElevation() == 0) {
+                if (!is_header_has_shadow) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         stickyHeader.setElevation(getResources().getDimension(R.dimen.news_header_elevation));
+                    } else {
+                        stickyHeaderElevation.setBackgroundResource(R.drawable.sticky_header_elevation);
                     }
-                } else {
-                    stickyHeader.setBackgroundResource(R.color.news_header_background_highlight);
+
+                    is_header_has_shadow = true;
                 }
             } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    if (stickyHeader.getElevation() != 0) {
+                if (is_header_has_shadow) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         stickyHeader.setElevation(0);
+                    } else {
+                        stickyHeaderElevation.setBackgroundColor(getResources().getColor(android.R.color.transparent));
                     }
-                } else {
-                    stickyHeader.setBackgroundResource(android.R.color.white);
+
+                    is_header_has_shadow = false;
                 }
             }
 
@@ -200,6 +215,36 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
         }
     }
 
+    private void getContentDetail(int content_id) {
+        buttonRetry.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+
+        String url = FETCH_NEWS_URL + "?content_id=" + content_id;
+
+        JsonObjectRequest request = new JsonObjectRequest(JsonObjectRequest.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i("Request", "Response " + response.toString());
+                try {
+                    body.loadData(response.getJSONObject("content_detail").getString("content"), "text/html; charset=utf-8", "UTF-8");
+
+                    progressBar.setVisibility(View.GONE);
+                } catch (JSONException e) {
+                    buttonRetry.setVisibility(View.VISIBLE);
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                buttonRetry.setVisibility(View.VISIBLE);
+                Log.e("Request", error.getMessage());
+            }
+        });
+
+        VolleySingleton.getInstance(this).addToRequestQueue(request);
+    }
+
     private void initFirstView() {
         //Initial Values
         TextView description = (TextView) findViewById(R.id.description);
@@ -218,9 +263,16 @@ public class ReadNewsActivity extends AppCompatActivity implements ObservableScr
         if (placeholder == null) { //Tablet Mode
             icon_width = (int) (icon_width * 0.33f);
 
-            LinearLayout firstColumn = (LinearLayout) findViewById(R.id.first_column);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(icon_width, LinearLayout.LayoutParams.MATCH_PARENT);
+            View firstColumn = findViewById(R.id.first_column);
+
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(icon_width, FrameLayout.LayoutParams.MATCH_PARENT);
             firstColumn.setLayoutParams(layoutParams);
+
+            View firstColumnPlaceholder = findViewById(R.id.first_column_placeholder);
+            if (firstColumnPlaceholder != null) {
+                LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(icon_width, LinearLayout.LayoutParams.MATCH_PARENT);
+                firstColumnPlaceholder.setLayoutParams(layoutParams2);
+            }
         }
         LinearLayout.LayoutParams iconLayoutParams = new LinearLayout.LayoutParams(icon_width, (int) (icon_width * 0.5f));
         icon.setLayoutParams(iconLayoutParams);

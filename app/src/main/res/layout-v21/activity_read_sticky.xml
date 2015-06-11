@@ -66,72 +66,50 @@
             </LinearLayout>
         </LinearLayout>
 
-        <FrameLayout
+
+        <LinearLayout
             android:id="@+id/sticky_header_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/news_header_vertical_padding"
+            android:paddingLeft="@dimen/news_header_horizontal_padding"
+            android:paddingRight="@dimen/news_header_horizontal_padding"
+            android:paddingTop="@dimen/news_header_vertical_padding">
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/source_icon"
+                android:layout_width="@dimen/source_icon_size"
+                android:layout_height="@dimen/source_icon_size"
+                android:contentDescription="avatar"
+                android:scaleType="centerCrop"
+                android:src="@drawable/cafe24h_icon" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/news_header_placeholder" />
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:paddingLeft="10dp">
 
-                <View
-                    android:id="@+id/sticky_header_elevation"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/news_header_elevation"/>
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/sticky_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/white"
-                android:orientation="horizontal"
-                android:paddingBottom="@dimen/news_header_vertical_padding"
-                android:paddingLeft="@dimen/news_header_horizontal_padding"
-                android:paddingRight="@dimen/news_header_horizontal_padding"
-                android:paddingTop="@dimen/news_header_vertical_padding">
-
-                <ImageView
-                    android:id="@+id/source_icon"
-                    android:layout_width="@dimen/source_icon_size"
-                    android:layout_height="@dimen/source_icon_size"
-                    android:contentDescription="avatar"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/cafe24h_icon" />
-
-                <RelativeLayout
+                <TextView
+                    android:id="@+id/title"
                     android:layout_width="fill_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_horizontal"
-                    android:paddingLeft="10dp">
+                    android:layout_height="wrap_content"
+                    android:lines="2"
+                    android:textSize="@dimen/title_font_size"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/title"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:lines="2"
-                        android:textSize="@dimen/title_font_size"
-                        android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/timestamp"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:textColor="#a0a3a7"
+                    android:textSize="@dimen/time_font_size" />
+            </RelativeLayout>
+        </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/timestamp"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:textColor="#a0a3a7"
-                        android:textSize="@dimen/time_font_size" />
-                </RelativeLayout>
-            </LinearLayout>
-
-        </FrameLayout>
     </FrameLayout>
 
 </cr4zyc4t.cafe24h.widget.ObservableScrollView>

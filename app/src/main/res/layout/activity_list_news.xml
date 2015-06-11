@@ -8,28 +8,58 @@
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="54dp"
-        android:background="@android:color/white" />
+        android:background="@android:color/white"
+        android:paddingTop="54dp" />
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/toolbar_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:elevation="8dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar_actionbar"
-            style="@style/ToolBarStyle"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/abc_action_bar_default_height_material"
-            android:background="?attr/colorPrimary" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-        <cr4zyc4t.cafe24h.widget.MySlidingTabLayout
-            android:id="@+id/sliding_tabs"
+            <!--placeholder of actionbar-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/abc_action_bar_default_height_material" />
+
+            <!--placeholder of tabbar-->
+            <View
+                android:id="@+id/sliding_tabs_placeholder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/news_header_elevation"
+                android:background="@drawable/sticky_header_elevation" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="?attr/colorPrimary">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar_actionbar"
+                style="@style/ToolBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/abc_action_bar_default_height_material"
+                android:background="?attr/colorPrimary" />
+
+            <cr4zyc4t.cafe24h.widget.MySlidingTabLayout
+                android:id="@+id/sliding_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </FrameLayout>
